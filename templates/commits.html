@@ -1,0 +1,10 @@
+{% block content %}
+    <h1>Commits for {{ repo_name }}</h1>
+    <ul>
+        {% for commit in commits %}
+            <li>
+            {{ commit.id }} - {{ commit.message }} - {{ commit.author.name }} - {{ commit.date }} {{ commit.diff_stats.files_changed }} files changed, {{ commit.diff_stats.insertions }} insertions, {{ commit.diff_stats.deletions }} deletions
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
