@@ -8,6 +8,8 @@ def get_refs(path):
         ref = repo.lookup_reference(ref_name)
         refs.append({
             'name': ref.name,
+            'shorthand': ref.shorthand,
+            # TODO: type, branch or tag
             'target': str(ref.target)
         })
     return refs

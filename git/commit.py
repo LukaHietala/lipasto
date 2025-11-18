@@ -69,6 +69,7 @@ def get_commit(path, commit_hash):
         'message': commit.message.strip(),
         'author': commit.author,
         'committer': commit.committer,
+        'tree_id': str(commit.tree.id),
         'date': commit.commit_time,
         'diff_stats': diff_stats,
         'diff': diff.patch if diff else None

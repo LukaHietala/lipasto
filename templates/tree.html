@@ -1,0 +1,14 @@
+{% block content %}
+    <h1>Tree for {{ repo_name }} at {{ ref }}{% if path %} / {{ path }}{% endif %}</h1>
+    <ul>
+        {% for item in tree_items %}
+            <li>
+                {% if item.type == 'tree' %}
+                    <a href="{{ url_for('repo_tree_path', repo_name=repo_name, path=item.path) }}?ref={{ ref }}">{{ item.name }} ({{ item.type }})/</a>
+                {% else %}
+                    {{ item.name }} ({{ item.type }})
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

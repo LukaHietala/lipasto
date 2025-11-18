@@ -3,6 +3,7 @@ from flask import Flask, render_template, request
 from git.repo import get_bare_repos
 from git.commit import get_commits, get_commit
 from git.ref import get_refs
+from git.tree import get_tree_items
 
 app = Flask(__name__)
 
@@ -34,6 +35,13 @@ def commit_detail(repo_name, commit_hash):
 def repo_refs(repo_name):
     refs = get_refs(f"{repo_path}/{repo_name}")
     return render_template("refs.html", repo_name=repo_name, refs=refs)
+
+@app.route("/<repo_name>/tree", defaults={'path': ''})
+@app.route("/<repo_name>/tree/<path:path>")
+def repo_tree_path(repo_name, path):
+    ref = request.args.get('ref', 'HEAD')
+    tree_items = get_tree_items(f"{repo_path}/{repo_name}", ref, path)
+    return render_template("tree.html", repo_name=repo_name, ref=ref, path=path, tree_items=tree_items)
 
 if __name__ == "__main__":
     app.run(debug=True)

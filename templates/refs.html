@@ -3,7 +3,7 @@
     <ul>
         {% for ref in refs %}
             <li>
-            {{ ref.name }} - {{ ref.target }}
+            {{ ref.name }} - {{ ref.target }} - <a href="{{ url_for('repo_tree_path', repo_name=repo_name, path='') }}?ref={{ ref.shorthand }}">View Tree</a>
             </li>
         {% endfor %}
     </ul>
