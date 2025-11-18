@@ -1,1 +1,8 @@
-<img src="https://cataas.com/cat/1DrcyohjhwcNaRIz?position=center"></img>
+{% block content %}
+    <h1>Repositories</h1>
+    <ul>
+        {% for repo in repos %}
+            <li><a href="{{ repo.name }}">{{ repo.name }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
