@@ -1,0 +1,11 @@
+{% block content %}
+<h1>Blob: {{ blob.name }}</h1>
+<p>Blob hash: {{ blob.id }}</p>
+<p>Size: {{ blob.size }} bytes</p>
+<h2>Content:</h2>
+{% if blob.is_binary %}
+    <pre>Binary...</pre>
+{% else %}
+<pre>{{ blob.content }}</pre>
+{% endif %}
+{% endblock %}

@@ -6,7 +6,7 @@
                 {% if item.type == 'tree' %}
                     <a href="{{ url_for('repo_tree_path', repo_name=repo_name, path=item.path) }}?ref={{ ref }}">{{ item.name }} ({{ item.type }})/</a>
                 {% else %}
-                    {{ item.name }} ({{ item.type }})
+                    <a href="{{ url_for('repo_blob_path', repo_name=repo_name, path=item.path) }}?ref={{ ref }}">{{ item.name }} ({{ item.type }}) {{ item.size }} bytes</a>
                 {% endif %}
             </li>
         {% endfor %}

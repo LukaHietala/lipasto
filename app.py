@@ -4,6 +4,7 @@ from git.repo import get_bare_repos
 from git.commit import get_commits, get_commit
 from git.ref import get_refs
 from git.tree import get_tree_items
+from git.blob import get_blob
 
 app = Flask(__name__)
 
@@ -42,6 +43,12 @@ def repo_tree_path(repo_name, path):
     ref = request.args.get('ref', 'HEAD')
     tree_items = get_tree_items(f"{repo_path}/{repo_name}", ref, path)
     return render_template("tree.html", repo_name=repo_name, ref=ref, path=path, tree_items=tree_items)
+
+@app.route("/<repo_name>/blob/<path:path>")
+def repo_blob_path(repo_name, path):
+    ref = request.args.get('ref', 'HEAD')
+    blob = get_blob(f"{repo_path}/{repo_name}", ref, path)
+    return render_template("blob.html", repo_name=repo_name, ref=ref, path=path, blob=blob)
 
 if __name__ == "__main__":
     app.run(debug=True)

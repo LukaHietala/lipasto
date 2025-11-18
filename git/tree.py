@@ -35,6 +35,7 @@ def get_tree_items(repo_path, ref="HEAD", tree_path=""):
         item = {
             'name': entry.name,
             'type': 'tree' if entry.type == git.GIT_OBJECT_TREE else 'blob',
+            'size': entry.size if entry.type == git.GIT_OBJECT_BLOB else None,
             'id': str(entry.id),
             'path': entry.name if not tree_path else f"{tree_path}/{entry.name}"
         }
