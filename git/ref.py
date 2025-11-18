@@ -1,5 +1,6 @@
 import pygit2 as git
 
+# retrieves all refs (branches, tags) for given repo path
 def get_refs(path):
     repo = git.Repository(path)
     refs = []

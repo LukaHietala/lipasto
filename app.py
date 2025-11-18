@@ -15,9 +15,15 @@ def index():
 @app.route("/<repo_name>/commits")
 def repo_commits(repo_name):
     ref = request.args.get('ref', 'HEAD')
+    page = int(request.args.get('page', 0))
+    # maybe pages are not the wisest way to do this?
+    per_page = 50
+    skip = page * per_page
 
-    commits = get_commits(f"{repo_path}/{repo_name}", ref=ref, max_count=50)
-    return render_template("commits.html", repo_name=repo_name, commits=commits)
+    commits = get_commits(f"{repo_path}/{repo_name}", ref=ref, max_count=per_page, skip=skip)
+    has_next = len(commits) == per_page
+    has_prev = page > 0
+    return render_template("commits.html", repo_name=repo_name, commits=commits, page=page, has_next=has_next, has_prev=has_prev, ref=ref)
 
 @app.route("/<repo_name>/commits/<commit_hash>")
 def commit_detail(repo_name, commit_hash):

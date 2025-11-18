@@ -1,14 +1,18 @@
 import pygit2 as git
 
 # retrieves commit history for given repo path and reference
-def get_commits(path, ref="HEAD", max_count=None):
+def get_commits(path, ref="HEAD", max_count=None, skip=0):
     repo = git.Repository(path)
     commits = []
     walker = repo.walk(repo.revparse_single(ref).id, git.GIT_SORT_TIME)
 
     n = 0
     for commit in walker:
-        if max_count is not None and n >= max_count:
+        # pagination, 50 per page, walk until skip, then collect commits until max_count
+        if n < skip:
+            n += 1
+            continue
+        if max_count is not None and (n - skip) >= max_count:
             break
         if len(commit.parents) > 0:
             # get diif stats against first parent
