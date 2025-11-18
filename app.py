@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 
 from git.repo import get_bare_repos
 from git.commit import get_commits, get_commit
+from git.ref import get_refs
 
 app = Flask(__name__)
 
@@ -22,6 +23,11 @@ def repo_commits(repo_name):
 def commit_detail(repo_name, commit_hash):
     commit = get_commit(f"{repo_path}/{repo_name}", commit_hash)
     return render_template("commit.html", repo_name=repo_name, commit=commit)
+
+@app.route("/<repo_name>/refs")
+def repo_refs(repo_name):
+    refs = get_refs(f"{repo_path}/{repo_name}")
+    return render_template("refs.html", repo_name=repo_name, refs=refs)
 
 if __name__ == "__main__":
     app.run(debug=True)

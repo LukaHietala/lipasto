@@ -1,0 +1,10 @@
+{% block content %}
+    <h1>Refs for {{ repo_name }}</h1>
+    <ul>
+        {% for ref in refs %}
+            <li>
+            {{ ref.name }} - {{ ref.target }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
