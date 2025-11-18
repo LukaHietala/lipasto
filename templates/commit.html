@@ -1,0 +1,15 @@
+{% block content %}
+    <h1>Commit {{ commit.id }}</h1>
+    <p>Message: {{ commit.message }}</p>
+    <p>Author: {{ commit.author.name }} &lt;{{ commit.author.email }}&gt;</p>
+    <p>Committer: {{ commit.committer.name }} &lt;{{ commit.committer.email }}&gt;</p>
+    <p>Date: {{ commit.date }}</p>
+    <h2>Diff Stats</h2>
+    <ul>
+        <li>Files Changed: {{ commit.diff_stats.files_changed }}</li>
+        <li>Insertions: {{ commit.diff_stats.insertions }}</li>
+        <li>Deletions: {{ commit.diff_stats.deletions }}</li>
+    </ul>
+    <h2>Diff</h2>
+    <pre>{{ commit.diff }}</pre>
+{% endblock %}
