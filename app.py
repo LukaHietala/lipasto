@@ -6,6 +6,7 @@ from git.ref import get_refs
 from git.tree import get_tree_items
 from git.blob import get_blob
 from git.misc import get_version
+from git.diff import get_diff
 
 app = Flask(__name__)
 
@@ -52,5 +53,12 @@ def repo_blob_path(repo_name, path):
     blob = get_blob(f"{repo_path}/{repo_name}", ref, path)
     return render_template("blob.html", repo_name=repo_name, ref=ref, path=path, blob=blob)
 
+@app.route("/<repo_name>/diff")
+def repo_diff(repo_name):
+    id1 = request.args.get('id1', 'HEAD')
+    id2 = request.args.get('id2', 'HEAD')
+    diff = get_diff(f"{repo_path}/{repo_name}", id1=id1, id2=id2)
+    return render_template("diff.html", diff=diff)
+    
 if __name__ == "__main__":
     app.run(debug=True)
