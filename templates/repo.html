@@ -1,6 +1,6 @@
+{% extends "base.html" %}
+
 {% block content %}
-<a href="{{ url_for('repo_commits', repo_name=repo_name) }}">Commits</a>
-<a href="{{ url_for('repo_refs', repo_name=repo_name) }}">Refs</a>
-<a href="{{ url_for('repo_tree_path', repo_name=repo_name) }}">Tree</a>
-<a href="{{ url_for('repo_diff', repo_name=repo_name) }}">Diff</a>
+<h1>Repository: {{ repo_name }}</h1>
+<img src="{{ url_for('static', filename='cat.png') }}" alt="cat">
 {% endblock %}

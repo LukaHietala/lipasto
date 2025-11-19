@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Py GitWeb</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="/">Home</a>
+        {% set repo_name = request.view_args.get('repo_name') %}
+        {% if repo_name %}
+        <a href="{{ url_for('repo_commits', repo_name=repo_name) }}">Commits</a>
+        <a href="{{ url_for('repo_refs', repo_name=repo_name) }}">Refs</a>
+        <a href="{{ url_for('repo_tree_path', repo_name=repo_name) }}">Tree</a>
+        <a href="{{ url_for('repo_diff', repo_name=repo_name) }}">Diff</a>
+        {% endif %}
+    </nav>
+    {% block content %}{% endblock %}
+</body>
+</html>

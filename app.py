@@ -16,6 +16,9 @@ load_dotenv()
 
 app = Flask(__name__)
 
+# for base.html
+app.jinja_env.globals['request'] = request
+
 repo_path = os.getenv('GIT_REPO_PATH')
 
 def datetime_filter(value, format='%Y-%m-%d %H:%M:%S'):
