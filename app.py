@@ -85,8 +85,8 @@ def repo_blame_path(repo_name, path):
 
 @app.route("/<repo_name>/diff")
 def repo_diff(repo_name):
-    id1 = request.args.get('id1', 'HEAD')
-    id2 = request.args.get('id2', 'HEAD')
+    id1 = request.args.get('id1')
+    id2 = request.args.get('id2')
     diff = get_diff(f"{repo_path}/{repo_name}", id1=id1, id2=id2)
     return render_template("diff.html", diff=diff)
     

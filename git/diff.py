@@ -1,10 +1,14 @@
 import pygit2 as git
 
 # compares two refs and return diff stats per file and full patch
-def get_diff(path, id1="HEAD", id2="HEAD"):
+def get_diff(path, id1, id2):
     repo = git.Repository(path)
-    ref_one = repo.revparse_single(id1)
-    ref_two = repo.revparse_single(id2)
+    if not id1:
+        id1 = 'HEAD~1'
+    if not id2:
+        id2 = 'HEAD'
+    ref_one = repo.revparse_single(id1) # older
+    ref_two = repo.revparse_single(id2) # newer
     diff = repo.diff(ref_one, ref_two)
 
     # TODO: context_lines, interhunk_lines, etc as options
@@ -48,7 +52,11 @@ def get_diff(path, id1="HEAD", id2="HEAD"):
 
     return {
         'patch': diff.patch,
-        'files': changed_files
+        'files': changed_files,
+        'ref1_id': str(ref_one.id),
+        'ref2_id': str(ref_two.id),
+        'ref1': id1,
+        'ref2': id2
     }
 
 

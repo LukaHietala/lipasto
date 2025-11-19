@@ -1,4 +1,6 @@
 {% block content %}
+<h1>Diff between {{ diff.ref1 }} ({{ diff.ref1_id[:7] }}) and {{ diff.ref2 }} ({{ diff.ref2_id[:7] }})</h1>
+
 <h2>Changed Files</h2>
 <ul>
     {% for file in diff.files %}
