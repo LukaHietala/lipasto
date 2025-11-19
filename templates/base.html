@@ -7,16 +7,30 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <nav>
+    <nav class="base-nav">
         <a href="/">Home</a>
         {% set repo_name = request.view_args.get('repo_name') %}
         {% if repo_name %}
-        <a href="{{ url_for('repo_commits', repo_name=repo_name) }}">Commits</a>
+        <a href="{{ url_for('repo_commits', repo_name=repo_name) }}?ref={{ current_ref }}">Commits</a>
         <a href="{{ url_for('repo_refs', repo_name=repo_name) }}">Refs</a>
-        <a href="{{ url_for('repo_tree_path', repo_name=repo_name) }}">Tree</a>
-        <a href="{{ url_for('repo_diff', repo_name=repo_name) }}">Diff</a>
+        <a href="{{ url_for('repo_tree_path', repo_name=repo_name) }}?ref={{ current_ref }}">Tree</a>
+        <a href="{{ url_for('repo_diff', repo_name=repo_name) }}?ref={{ current_ref }}">Diff</a>
+        {% endif %}
+        {% if refs %}
+        <select onchange="changeRef(this.value)" style="margin-left:auto">
+            {% for ref in refs %}
+            <option value="{{ ref.shorthand }}" {% if ref.shorthand == current_ref %}selected{% endif %}>{{ ref.name }}</option>
+            {% endfor %}
+        </select>
         {% endif %}
     </nav>
+    <script>
+        function changeRef(newRef) {
+            const url = new URL(window.location);
+            url.searchParams.set('ref', newRef);
+            window.location = url;
+        }
+    </script>
     {% block content %}{% endblock %}
 </body>
 </html>

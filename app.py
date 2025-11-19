@@ -19,6 +19,10 @@ app = Flask(__name__)
 # for base.html
 app.jinja_env.globals['request'] = request
 
+@app.context_processor
+def inject_current_ref():
+    return {'current_ref': request.args.get('ref', 'HEAD')}
+
 repo_path = os.getenv('GIT_REPO_PATH')
 
 def datetime_filter(value, format='%Y-%m-%d %H:%M:%S'):
@@ -42,11 +46,13 @@ def index():
 
 @app.route("/<repo_name>")
 def repo_detail(repo_name):
-    return render_template("repo.html", repo_name=repo_name)
+    refs = get_refs(f"{repo_path}/{repo_name}")
+    return render_template("repo.html", repo_name=repo_name, refs=refs)
 
 @app.route("/<repo_name>/commits")
 def repo_commits(repo_name):
     ref = request.args.get('ref', 'HEAD')
+    refs = get_refs(f"{repo_path}/{repo_name}")
     page = int(request.args.get('page', 0))
     # maybe pages are not the wisest way to do this?
     per_page = 50
@@ -55,7 +61,7 @@ def repo_commits(repo_name):
     commits = get_commits(f"{repo_path}/{repo_name}", ref=ref, max_count=per_page, skip=skip)
     has_next = len(commits) == per_page
     has_prev = page > 0
-    return render_template("commits.html", repo_name=repo_name, commits=commits, page=page, has_next=has_next, has_prev=has_prev, ref=ref)
+    return render_template("commits.html", repo_name=repo_name, commits=commits, page=page, has_next=has_next, has_prev=has_prev, ref=ref, refs=refs)
 
 @app.route("/<repo_name>/commits/<commit_id>")
 def commit_detail(repo_name, commit_id):
@@ -71,27 +77,31 @@ def repo_refs(repo_name):
 @app.route("/<repo_name>/tree/<path:path>")
 def repo_tree_path(repo_name, path):
     ref = request.args.get('ref', 'HEAD')
+    refs = get_refs(f"{repo_path}/{repo_name}")
     tree_items = get_tree_items(f"{repo_path}/{repo_name}", ref, path)
-    return render_template("tree.html", repo_name=repo_name, ref=ref, path=path, tree_items=tree_items)
+    return render_template("tree.html", repo_name=repo_name, ref=ref, path=path, tree_items=tree_items, refs=refs)
 
 @app.route("/<repo_name>/blob/<path:path>")
 def repo_blob_path(repo_name, path):
     ref = request.args.get('ref', 'HEAD')
+    refs = get_refs(f"{repo_path}/{repo_name}")
     blob = get_blob(f"{repo_path}/{repo_name}", ref, path)
-    return render_template("blob.html", repo_name=repo_name, ref=ref, path=path, blob=blob)
+    return render_template("blob.html", repo_name=repo_name, ref=ref, path=path, blob=blob, refs=refs)
 
 @app.route("/<repo_name>/blame/<path:path>")
 def repo_blame_path(repo_name, path):
     ref = request.args.get('ref', 'HEAD')
+    refs = get_refs(f"{repo_path}/{repo_name}")
     blame = get_blame(f"{repo_path}/{repo_name}", ref, path)
-    return render_template("blame.html", repo_name=repo_name, ref=ref, path=path, blame=blame)
+    return render_template("blame.html", repo_name=repo_name, ref=ref, path=path, blame=blame, refs=refs)
 
 @app.route("/<repo_name>/diff")
 def repo_diff(repo_name):
+    refs = get_refs(f"{repo_path}/{repo_name}")
     id1 = request.args.get('id1')
     id2 = request.args.get('id2')
     diff = get_diff(f"{repo_path}/{repo_name}", id1=id1, id2=id2)
-    return render_template("diff.html", diff=diff)
+    return render_template("diff.html", diff=diff, refs=refs)
     
 if __name__ == "__main__":
     app.run(debug=True)
