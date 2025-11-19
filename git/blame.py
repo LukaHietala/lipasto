@@ -5,6 +5,7 @@ import pygit2 as git
 def get_blame(repo_path, ref="HEAD", file_path=""):
     repo = git.Repository(repo_path)
     obj = repo.revparse_single(ref)
+    # TODO: doesnt work with tree refs
     if obj.type == git.GIT_OBJECT_COMMIT:
         commit = obj
     else:

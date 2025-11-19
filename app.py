@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+from datetime import datetime
 
 from git.repo import get_bare_repos
 from git.commit import get_commits, get_commit
@@ -10,6 +11,19 @@ from git.diff import get_diff
 from git.blame import get_blame
 
 app = Flask(__name__)
+
+def datetime_filter(value, format='%Y-%m-%d %H:%M:%S'):
+    if isinstance(value, datetime):
+        # format regular datetime 
+        return value.strftime(format)
+    elif isinstance(value, (int, float)):
+        # if not datetime, but number, try to convert
+        # just assume its unix timestamp, git uses that
+        dt = datetime.fromtimestamp(value)
+        return dt.strftime(format)
+    return value
+
+app.jinja_env.filters['datetime'] = datetime_filter
 
 repo_path = "/home/lhietala/git-webview/repos-example"
 @app.route("/")

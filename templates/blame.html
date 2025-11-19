@@ -18,7 +18,7 @@
             {% if line.blame %}
             <td><a href="{{ url_for('commit_detail', repo_name=repo_name, commit_id=line.blame.commit_id) }}">{{ line.blame.commit_id[:8] }}</a></td>
             <td>{{ line.blame.author.name }}</td>
-            <td>{{ line.blame.author.time }}</td>
+            <td>{{ line.blame.author.time | datetime }}</td>
             {% else %}
             <td></td>
             <td></td>
