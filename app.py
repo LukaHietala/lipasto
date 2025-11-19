@@ -30,9 +30,9 @@ def repo_commits(repo_name):
     has_prev = page > 0
     return render_template("commits.html", repo_name=repo_name, commits=commits, page=page, has_next=has_next, has_prev=has_prev, ref=ref)
 
-@app.route("/<repo_name>/commits/<commit_hash>")
-def commit_detail(repo_name, commit_hash):
-    commit = get_commit(f"{repo_path}/{repo_name}", commit_hash)
+@app.route("/<repo_name>/commits/<commit_id>")
+def commit_detail(repo_name, commit_id):
+    commit = get_commit(f"{repo_path}/{repo_name}", commit_id)
     return render_template("commit.html", repo_name=repo_name, commit=commit)
 
 @app.route("/<repo_name>/refs")

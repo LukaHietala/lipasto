@@ -5,7 +5,7 @@
     <p>Committer: {{ commit.committer.name }} &lt;{{ commit.committer.email }}&gt;</p>
     <p>Date: {{ commit.date }}</p>
     {% if commit.parent_id %}
-    <p>Parent: <a href="{{ url_for('commit_detail', repo_name=repo_name, commit_hash=commit.parent_id) }}">{{ commit.parent_id }}</a></p>
+    <p>Parent: <a href="{{ url_for('commit_detail', repo_name=repo_name, commit_id=commit.parent_id) }}">{{ commit.parent_id }}</a></p>
     {% endif %}
     <p>Tree: <a href="{{ url_for('repo_tree_path', repo_name=repo_name, path='') }}?ref={{ commit.tree_id }}">{{ commit.tree_id }}</a></p>
     <p><a href="{{ url_for('repo_tree_path', repo_name=repo_name, path='') }}?ref={{ commit.id }}">View Tree</a></p>

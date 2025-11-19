@@ -4,7 +4,7 @@
     <ul>
         {% for commit in commits %}
             <li>
-            <a href="{{ url_for('commit_detail', repo_name=repo_name, commit_hash=commit.id) }}">{{ commit.id }}</a> - {{ commit.message }} - {{ commit.author.name }} - {{ commit.date }} {{ commit.diff_stats.files_changed }} files changed, {{ commit.diff_stats.insertions }} insertions, {{ commit.diff_stats.deletions }} deletions
+            <a href="{{ url_for('commit_detail', repo_name=repo_name, commit_id=commit.id) }}">{{ commit.id }}</a> - {{ commit.message }} - {{ commit.author.name }} - {{ commit.date }} {{ commit.diff_stats.files_changed }} files changed, {{ commit.diff_stats.insertions }} insertions, {{ commit.diff_stats.deletions }} deletions
             </li>
         {% endfor %}
     </ul>
