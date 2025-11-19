@@ -37,6 +37,10 @@ def index():
     version = get_version()
     return render_template("index.html", repos=repos, version=version)
 
+@app.route("/<repo_name>")
+def repo_detail(repo_name):
+    return render_template("repo.html", repo_name=repo_name)
+
 @app.route("/<repo_name>/commits")
 def repo_commits(repo_name):
     ref = request.args.get('ref', 'HEAD')
