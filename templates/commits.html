@@ -2,7 +2,6 @@
 
 {% block content %}
     <h1>Commits for {{ repo_name }}</h1>
-    <p><a href="{{ url_for('repo_tree_path', repo_name=repo_name, path='') }}?ref={{ ref }}">View Tree</a></p>
     <table border="1">
         <thead>
             <tr>
