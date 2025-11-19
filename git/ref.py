@@ -5,6 +5,14 @@ import pygit2 as git
 def get_refs(path):
     repo = git.Repository(path)
     refs = []
+    # add head ref manually
+    head_ref = repo.head
+    refs.append({
+        'name': "HEAD",
+        'shorthand': "HEAD",
+        'target': str(head_ref.target)
+    })
+    
     for ref_name in repo.listall_references():
         ref = repo.lookup_reference(ref_name)
         refs.append({
