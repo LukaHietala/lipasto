@@ -1,5 +1,7 @@
+import os
 from flask import Flask, render_template, request
 from datetime import datetime
+from dotenv import load_dotenv
 
 from git.repo import get_bare_repos
 from git.commit import get_commits, get_commit
@@ -10,7 +12,11 @@ from git.misc import get_version
 from git.diff import get_diff
 from git.blame import get_blame
 
+load_dotenv()
+
 app = Flask(__name__)
+
+repo_path = os.getenv('GIT_REPO_PATH')
 
 def datetime_filter(value, format='%Y-%m-%d %H:%M:%S'):
     if isinstance(value, datetime):
@@ -25,7 +31,6 @@ def datetime_filter(value, format='%Y-%m-%d %H:%M:%S'):
 
 app.jinja_env.filters['datetime'] = datetime_filter
 
-repo_path = "/home/lhietala/git-webview/repos-example"
 @app.route("/")
 def index():
     repos = get_bare_repos(repo_path)
