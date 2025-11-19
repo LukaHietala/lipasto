@@ -1,6 +1,7 @@
 import pygit2 as git
 
 # retrieves all refs (branches, tags) for given repo path
+# TODO: handle symbolic refs and situation when HEAD is unborn or pointing to nothing
 def get_refs(path):
     repo = git.Repository(path)
     refs = []

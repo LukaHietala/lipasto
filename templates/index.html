@@ -5,4 +5,7 @@
             <li><a href="{{ url_for('repo_commits', repo_name=repo.name) }}">{{ repo.name }}</a></li>
         {% endfor %}
     </ul>
+    <small>
+        Libgit2 - {{ version }}  git 
+    </small>
 {% endblock %}

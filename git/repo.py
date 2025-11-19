@@ -6,6 +6,7 @@ def get_bare_repos(path):
     repos = []
 
     repo_path = Path(path)
+
     for item in repo_path.iterdir():
         if item.is_dir():
             try:

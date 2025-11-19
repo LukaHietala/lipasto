@@ -5,6 +5,7 @@ from git.commit import get_commits, get_commit
 from git.ref import get_refs
 from git.tree import get_tree_items
 from git.blob import get_blob
+from git.misc import get_version
 
 app = Flask(__name__)
 
@@ -12,7 +13,8 @@ repo_path = "/home/lhietala/git-webview/repos-example"
 @app.route("/")
 def index():
     repos = get_bare_repos(repo_path)
-    return render_template("index.html", repos=repos)
+    version = get_version()
+    return render_template("index.html", repos=repos, version=version)
 
 @app.route("/<repo_name>/commits")
 def repo_commits(repo_name):
