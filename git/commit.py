@@ -70,6 +70,7 @@ def get_commit(path, commit_hash):
         'author': commit.author,
         'committer': commit.committer,
         'tree_id': str(commit.tree.id),
+        'parent_id': str(commit.parents[0].id) if commit.parents else None,
         'date': commit.commit_time,
         'diff_stats': diff_stats,
         'diff': diff.patch if diff else None

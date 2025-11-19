@@ -4,14 +4,23 @@
     <p>Author: {{ commit.author.name }} &lt;{{ commit.author.email }}&gt;</p>
     <p>Committer: {{ commit.committer.name }} &lt;{{ commit.committer.email }}&gt;</p>
     <p>Date: {{ commit.date }}</p>
+    {% if commit.parent_id %}
+    <p>Parent: <a href="{{ url_for('commit_detail', repo_name=repo_name, commit_hash=commit.parent_id) }}">{{ commit.parent_id }}</a></p>
+    {% endif %}
     <p>Tree: <a href="{{ url_for('repo_tree_path', repo_name=repo_name, path='') }}?ref={{ commit.tree_id }}">{{ commit.tree_id }}</a></p>
     <p><a href="{{ url_for('repo_tree_path', repo_name=repo_name, path='') }}?ref={{ commit.id }}">View Tree</a></p>
+    {% if commit.diff %}
     <h2>Diff Stats</h2>
     <ul>
         <li>Files Changed: {{ commit.diff_stats.files_changed }}</li>
         <li>Insertions: {{ commit.diff_stats.insertions }}</li>
         <li>Deletions: {{ commit.diff_stats.deletions }}</li>
     </ul>
+    {% endif %}
     <h2>Diff</h2>
+    {% if commit.diff %}
     <pre>{{ commit.diff }}</pre>
+    {% else %}
+    <p>No changes compared to parent</p>
+    {% endif %}
 {% endblock %}
