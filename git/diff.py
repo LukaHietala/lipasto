@@ -1,13 +1,54 @@
 import pygit2 as git
 
-# compares two refs and return diff
-# TODO: per file, now just full hunk, per file stats, and no changes to compare.
+# compares two refs and return diff stats per file and full patch
 def get_diff(path, id1="HEAD", id2="HEAD"):
     repo = git.Repository(path)
     ref_one = repo.revparse_single(id1)
     ref_two = repo.revparse_single(id2)
     diff = repo.diff(ref_one, ref_two)
 
-    return diff.patch
+    # TODO: context_lines, interhunk_lines, etc as options
+
+    # detect renames and copies, if not they are just deletions and additions
+    # rename and copy thresholds are 50% by default in libgit2
+    # https://libgit2.org/docs/reference/main/diff/git_diff_find_options.html
+    # debating whether to keep or remove this, but for now it's useful. or atleast alter the default thresholds
+    diff.find_similar()
+
+    # map libgit2 delta status to human readable, most not used, but good to have them all here
+    status_map = {
+        git.GIT_DELTA_ADDED: 'added',
+        git.GIT_DELTA_DELETED: 'deleted',
+        git.GIT_DELTA_MODIFIED: 'modified',
+        git.GIT_DELTA_RENAMED: 'renamed',
+        git.GIT_DELTA_COPIED: 'copied',
+        git.GIT_DELTA_IGNORED: 'ignored',
+        git.GIT_DELTA_UNTRACKED: 'untracked',
+        git.GIT_DELTA_TYPECHANGE: 'typechange',
+        git.GIT_DELTA_UNREADABLE: 'unreadable',
+        git.GIT_DELTA_CONFLICTED: 'conflicted'
+    }
+
+    patches = list(diff)
+    deltas = diff.deltas
+    changed_files = []
+
+    for i, delta in enumerate(deltas):
+        patch = patches[i]
+        file_path = delta.new_file.path if delta.new_file.path else delta.old_file.path
+        # insertions and deletions in diff stats and additions and deletions in delta line stats. little confusing 
+        _, additions, deletions = patch.line_stats # (context, additions, deletions)
+        status_str = status_map.get(delta.status, 'unknown')
+        changed_files.append({
+            'file': file_path,
+            'additions': additions,
+            'deletions': deletions,
+            'status': status_str
+        })
+
+    return {
+        'patch': diff.patch,
+        'files': changed_files
+    }
 
 
