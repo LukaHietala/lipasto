@@ -2,6 +2,7 @@
 <h1>Blob: {{ blob.name }}</h1>
 <p>Blob id: {{ blob.id }}</p>
 <p>Size: {{ blob.size }} bytes</p>
+<p><a href="{{ url_for('repo_blame_path', repo_name=repo_name, path=path) }}?ref={{ ref }}">Blame</a></p>
 <h2>Content:</h2>
 {% if blob.is_binary %}
     <pre>Binary...</pre>

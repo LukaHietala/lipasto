@@ -1,0 +1,35 @@
+{% block content %}
+<h1>Blame: {{ path }}</h1>
+{% if blame %}
+<table border="1"> <!-- temp default styling --->
+    <thead>
+        <tr>
+            <th>Line</th>
+            <th>Commit</th>
+            <th>Author</th>
+            <th>Date</th>
+            <th>Content</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for line in blame %}
+        <tr>
+            <td>{{ line.line_num }}</td>
+            {% if line.blame %}
+            <td><a href="{{ url_for('commit_detail', repo_name=repo_name, commit_id=line.blame.commit_id) }}">{{ line.blame.commit_id[:8] }}</a></td>
+            <td>{{ line.blame.author.name }}</td>
+            <td>{{ line.blame.author.time }}</td>
+            {% else %}
+            <td></td>
+            <td></td>
+            <td></td>
+            {% endif %}
+            <td><pre>{{ line.content }}</pre></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No blame info</p>
+{% endif %}
+{% endblock %}

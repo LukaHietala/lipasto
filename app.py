@@ -7,6 +7,7 @@ from git.tree import get_tree_items
 from git.blob import get_blob
 from git.misc import get_version
 from git.diff import get_diff
+from git.blame import get_blame
 
 app = Flask(__name__)
 
@@ -52,6 +53,12 @@ def repo_blob_path(repo_name, path):
     ref = request.args.get('ref', 'HEAD')
     blob = get_blob(f"{repo_path}/{repo_name}", ref, path)
     return render_template("blob.html", repo_name=repo_name, ref=ref, path=path, blob=blob)
+
+@app.route("/<repo_name>/blame/<path:path>")
+def repo_blame_path(repo_name, path):
+    ref = request.args.get('ref', 'HEAD')
+    blame = get_blame(f"{repo_path}/{repo_name}", ref, path)
+    return render_template("blame.html", repo_name=repo_name, ref=ref, path=path, blame=blame)
 
 @app.route("/<repo_name>/diff")
 def repo_diff(repo_name):

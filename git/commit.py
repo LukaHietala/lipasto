@@ -4,6 +4,7 @@ import pygit2 as git
 def get_commits(path, ref="HEAD", max_count=None, skip=0):
     repo = git.Repository(path)
     commits = []
+    # TODO: accept blob oids to filter commits that touch specific blobs
     walker = repo.walk(repo.revparse_single(ref).id, git.GIT_SORT_TIME)
 
     n = 0
