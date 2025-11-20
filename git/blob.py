@@ -1,4 +1,5 @@
 import pygit2 as git
+from highlight import highlight_code
 
 # retrieves a blob content for given ref and path
 def get_blob(repo_path, ref="HEAD", blob_path=""):
@@ -22,14 +23,19 @@ def get_blob(repo_path, ref="HEAD", blob_path=""):
                 if entry.name == part:
                     if entry.type == git.GIT_OBJECT_BLOB:
                         blob = repo.get(entry.id)
-                        return {
+                        content = blob.data.decode('utf-8', errors='replace')
+                        result = {
                             'name': entry.name,
                             'id': str(entry.id),
                             'path': blob_path,
                             'size': blob.size,
                             'is_binary': blob.is_binary,
-                            'content': blob.data.decode('utf-8', errors='replace')
+                            'content': content
                         }
+                        # add highlighted content
+                        if not blob.is_binary:
+                            result['highlighted'] = highlight_code(content, entry.name)
+                        return result
                     elif entry.type == git.GIT_OBJECT_TREE:
                         tree = repo.get(entry.id)
                         found = True
