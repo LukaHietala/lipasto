@@ -122,8 +122,8 @@ def repo_blob_path(repo_name, path):
 def repo_blame_path(repo_name, path):
     ref = request.args.get('ref', 'HEAD')
     refs = get_refs(f"{repo_path}/{repo_name}")
-    blame = get_blame(f"{repo_path}/{repo_name}", ref, path)
-    return render_template("blame.html", repo_name=repo_name, ref=ref, path=path, blame=blame, refs=refs)
+    blame, style = get_blame(f"{repo_path}/{repo_name}", ref, path)
+    return render_template("blame.html", repo_name=repo_name, ref=ref, path=path, blame=blame, refs=refs, style=style)
 
 @app.route("/<repo_name>/diff")
 def repo_diff(repo_name):

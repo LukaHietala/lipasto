@@ -117,7 +117,13 @@ table.commits-table .message-col {
 }
 
 .deletions {
-	color: red;
+    color: red;
+}
+
+.blame-code {
+    background-color: #f9f9f9;
+    border: 1px solid lightgray;
+    overflow-x: auto;
 }
 
 

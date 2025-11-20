@@ -1,4 +1,5 @@
 import pygit2 as git
+from highlight import get_highlight_blame_style, highlight_line
 
 # discourage using blame because its very expensive, especially on repos with long commits history
 # retrieves blame information for a file at given ref and path
@@ -61,7 +62,9 @@ def get_blame(repo_path, ref="HEAD", file_path=""):
         result.append({
             'line_num': i + 1,
             'content': line,
-            'blame': blame_lines[i]
+            'blame': blame_lines[i],
+            # highlight every line individually
+            'highlighted': highlight_line(line, file_path)
         })
-    
-    return result
+        
+    return result, get_highlight_blame_style()

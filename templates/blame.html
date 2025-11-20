@@ -1,36 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>{{ style }}</style>
+<style>.blame-code pre { line-height: 0.7; }</style>
 <h1>Blame: {{ path }}</h1>
 {% if blame %}
-<table class="list"> <!-- temp default styling --->
-    <thead>
-        <tr>
-            <th>Line</th>
-            <th>Commit</th>
-            <th>Author</th>
-            <th>Date</th>
-            <th>Content</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for line in blame %}
-        <tr>
-            <td>{{ line.line_num }}</td>
-            {% if line.blame %}
-            <td><a href="{{ url_for('commit_detail', repo_name=repo_name, commit_id=line.blame.commit_id) }}">{{ line.blame.commit_id[:8] }}</a></td>
-            <td>{{ line.blame.author.name }}</td>
-            <td>{{ line.blame.author.time | datetime }}</td>
-            {% else %}
-            <td></td>
-            <td></td>
-            <td></td>
-            {% endif %}
-            <td><pre>{{ line.content }}</pre></td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="blame-code"><pre>
+<!-- first 4 chars are for line number -->
+<!-- next part is for commit id (8 chars), then author (15 chars, cutoff if over), date/time -->
+<!-- this is just to keep the alignment -->
+{% for line in blame %}{{ "%4s" % line.line_num }} {% if line.blame %}<a href="{{ url_for('commit_detail', repo_name=repo_name, commit_id=line.blame.commit_id) }}">{{ line.blame.commit_id[:8] }}</a> {{ "%-15s" % line.blame.author.name[:15] }} {{ line.blame.author.time | datetime }}{% endif %} | {{ line.highlighted | safe }}
+{% endfor %}</pre></div>
 {% else %}
 <p>No blame info</p>
 {% endif %}
