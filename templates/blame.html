@@ -1,17 +1,67 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>{{ style }}</style>
+<style id="blame-style"></style>
 <style>.blame-code pre { line-height: 0.7; }</style>
 <h1>Blame: {{ path }}</h1>
-{% if blame %}
-<div class="blame-code"><pre>
-<!-- first 4 chars are for line number -->
-<!-- next part is for commit id (8 chars), then author (15 chars, cutoff if over), date/time -->
-<!-- this is just to keep the alignment -->
-{% for line in blame %}{{ "%4s" % line.line_num }} {% if line.blame %}<a href="{{ url_for('commit_detail', repo_name=repo_name, commit_id=line.blame.commit_id) }}">{{ line.blame.commit_id[:8] }}</a> {{ "%-15s" % line.blame.author.name[:15] }} {{ line.blame.author.time | datetime }}{% endif %} | {{ line.highlighted | safe }}
-{% endfor %}</pre></div>
-{% else %}
-<p>No blame info</p>
-{% endif %}
+<div id="loading">Loading blame information, this may take a while for large files...</div>
+<div id="pomeranian" style="display: none; margin-top: 20px;">
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/Q-KciIbk_oA?si=c_DqdaVbYMlfhxW7&amp;controls=0&amp;autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div id="blame-content" style="display: none;">
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const repo_name = window.location.pathname.split('/')[1];
+    const pomeranianTimeout = setTimeout(() => {
+        document.getElementById('pomeranian').style.display = 'block';
+    }, 5000);
+    
+    fetch(window.location.href, {
+        headers: {
+            // let server know that this is ajax
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        clearTimeout(pomeranianTimeout);
+        document.getElementById('blame-style').innerHTML = data.style;
+        
+        // add blame content, previosly templating
+        let content = '<div class="blame-code"><pre>';
+        if (data.blame && data.blame.length > 0) {
+            data.blame.forEach(line => {
+                content += `${String(line.line_num).padStart(4)} `;
+                if (line.blame) {
+                    content += `<a href="/${repo_name}/commits/${line.blame.commit_id}">${line.blame.commit_id.substring(0, 8)}</a> ${line.blame.author.name.substring(0, 15).padEnd(15)} ${new Date(line.blame.author.time * 1000).toISOString().slice(0, 19).replace('T', ' ')}`;
+                }
+                content += ` | ${line.highlighted}\n`;
+            });
+        } else {
+            content += 'No blame info';
+        }
+        content += '</pre></div>';
+        
+        document.getElementById('blame-content').innerHTML = content;
+        document.getElementById('loading').style.display = 'none';
+        // clear iframe
+        const iframe = document.querySelector('#pomeranian iframe');
+        if (iframe) {
+            iframe.src = 'about:blank';
+        }
+        document.getElementById('pomeranian').style.display = 'none';
+        document.getElementById('blame-content').style.display = 'block';
+    })
+    .catch(error => {
+        clearTimeout(pomeranianTimeout);
+        document.getElementById('loading').innerHTML = 'Error loading blame';
+        const iframe = document.querySelector('#pomeranian iframe');
+        if (iframe) {
+            iframe.src = 'about:blank';
+        }
+        document.getElementById('pomeranian').style.display = 'none';
+    });
+});
+</script>
 {% endblock %}

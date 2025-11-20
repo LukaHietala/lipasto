@@ -50,7 +50,10 @@ def get_blame(repo_path, ref="HEAD", file_path=""):
         # TODO: more info if needed
         info = {
             'commit_id': str(hunk.final_commit_id),
-            'author': commit.author,
+            'author': {
+                'name': commit.author.name,
+                'time': commit.author.time,
+            },
         }
         # fill premade info for lines in this hunk
         for i in range(start, min(end, len(blame_lines))): # prevent index overflow, with min
