@@ -36,7 +36,35 @@ def datetime_filter(value, format='%Y-%m-%d %H:%M:%S'):
         return dt.strftime(format)
     return value
 
+# age filter to show relative time like "2 days ago" 
+def age_filter(value):
+    if isinstance(value, (int, float)):
+        dt = datetime.fromtimestamp(value)
+    elif isinstance(value, datetime):
+        dt = value
+    else:
+        return value
+    now = datetime.now()
+    diff = now - dt
+    if diff.days > 365:
+        years = diff.days // 365
+        return f"{years} year{'s' if years != 1 else ''} ago"
+    elif diff.days > 30:
+        months = diff.days // 30
+        return f"{months} month{'s' if months != 1 else ''} ago"
+    elif diff.days > 0:
+        return f"{diff.days} day{'s' if diff.days != 1 else ''} ago"
+    elif diff.seconds > 3600:
+        hours = diff.seconds // 3600
+        return f"{hours} hour{'s' if hours != 1 else ''} ago"
+    elif diff.seconds > 60:
+        minutes = diff.seconds // 60
+        return f"{minutes} minute{'s' if minutes != 1 else ''} ago"
+    else:
+        return "just now"
+
 app.jinja_env.filters['datetime'] = datetime_filter
+app.jinja_env.filters['age'] = age_filter
 
 @app.route("/")
 def index():

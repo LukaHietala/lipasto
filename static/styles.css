@@ -36,17 +36,6 @@ nav a.active {
     font-weight: bold;
 }
 
-table {
-    border-collapse: collapse;
-    width: 100%;
-}
-
-th, td {
-    border: 1px solid lightgray;
-    padding: 2px 4px;
-    text-align: left;
-}
-
 pre {
     font-family: monospace;
     font-size: 10pt;
@@ -66,4 +55,70 @@ h2 {
     font-size: 110%;
     margin: 1em 0 0.5em 0;
 }
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    border: 1px solid lightgray;
+    padding: 4px 8px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+tbody tr:nth-child(even) {
+	background-color: #f9f9f9;
+}
+
+/* commits table */
+table.commits-table {
+	width: 100%;
+	table-layout: fixed;
+}
+
+table.commits-table td {
+	white-space: nowrap;
+}
+
+table.commits-table th, table.commits-table td {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+table.commits-table .author-col {
+	width: 15%;
+}
+
+table.commits-table .age-col {
+	width: 10%;
+}
+
+table.commits-table .changes-col {
+	width: 10%;
+}
+
+table.commits-table .commit-col {
+	width: 6%;
+}
+
+table.commits-table .message-col {
+	width: 59%;
+	white-space: nowrap;
+}
+
+.files-changed {
+	color: grey;
+}
+
+.insertions {
+	color: green;
+}
+
+.deletions {
+	color: red;
+}
+
+
 
