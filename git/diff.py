@@ -1,17 +1,24 @@
 import pygit2 as git
 
 # compares two refs and return diff stats per file and full patch
-def get_diff(path, id1, id2):
+def get_diff(path, id1, id2, context_lines=3, interhunk_lines=0, **options):
     repo = git.Repository(path)
     if not id1:
-        id1 = 'HEAD~1'
+        id1 = 'HEAD~1' # default to previous commit
     if not id2:
         id2 = 'HEAD'
-    ref_one = repo.revparse_single(id1) # older
-    ref_two = repo.revparse_single(id2) # newer
-    diff = repo.diff(ref_one, ref_two)
-
-    # TODO: context_lines, interhunk_lines, etc as options
+    try:
+        ref_one = repo.revparse_single(id1).peel(git.Commit)  # potential older, HOPEFULLY
+        ref_two = repo.revparse_single(id2).peel(git.Commit)  # potential newer, HOPEFULLY
+    except Exception as e:
+        raise ValueError(f"Invalid ref: {id1} or {id2}. Error: {str(e)}")
+    
+    # make sure that ref_one (from) is older than ref_two (to), swap if necessary
+    if ref_one.commit_time > ref_two.commit_time:
+        ref_one, ref_two = ref_two, ref_one
+        id1, id2 = id2, id1
+    
+    diff = repo.diff(ref_one, ref_two, context_lines=context_lines, interhunk_lines=interhunk_lines, **options)
 
     # detect renames and copies, if not they are just deletions and additions
     # rename and copy thresholds are 50% by default in libgit2

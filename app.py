@@ -11,6 +11,7 @@ from git.blob import get_blob
 from git.misc import get_version
 from git.diff import get_diff
 from git.blame import get_blame
+from highlight import highlight_diff
 
 load_dotenv()
 
@@ -129,8 +130,16 @@ def repo_diff(repo_name):
     refs = get_refs(f"{repo_path}/{repo_name}")
     id1 = request.args.get('id1')
     id2 = request.args.get('id2')
-    diff = get_diff(f"{repo_path}/{repo_name}", id1=id1, id2=id2)
-    return render_template("diff.html", diff=diff, refs=refs)
-    
+    context_lines = int(request.args.get('context_lines', 3))
+    interhunk_lines = int(request.args.get('interhunk_lines', 0))
+    # TODO: ADD ERROR HANDLING EVERYWHERE!!
+    try:
+        diff = get_diff(f"{repo_path}/{repo_name}", id1=id1, id2=id2, context_lines=context_lines, interhunk_lines=interhunk_lines)
+        highlighted_patch = highlight_diff(diff['patch'])
+        return render_template("diff.html", diff=diff, refs=refs, context_lines=context_lines, interhunk_lines=interhunk_lines, highlighted_patch=highlighted_patch)
+    except ValueError as e:
+        return render_template("diff.html", error=str(e), refs=refs, context_lines=context_lines, interhunk_lines=interhunk_lines)
+    except Exception as e:
+        return render_template("diff.html", error="Server error", refs=refs, context_lines=context_lines, interhunk_lines=interhunk_lines)
 if __name__ == "__main__":
     app.run(debug=True)

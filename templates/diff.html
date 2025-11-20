@@ -1,17 +1,52 @@
 {% extends "base.html" %}
 
 {% block content %}
+<h1>Diff</h1>
+
+{% if error %}
+<p style="color: red;">Error: {{ error }}</p>
+{% endif %}
+
+{% if diff %}
 <h1>Diff between {{ diff.ref1 }} ({{ diff.ref1_id[:7] }}) and {{ diff.ref2 }} ({{ diff.ref2_id[:7] }})</h1>
 
+<form method="get" action="">
+    <label for="id1">From:</label>
+    <input type="text" name="id1" value="{{ diff.ref1 }}" id="id1">
+    <label for="id2">To:</label>
+    <input type="text" name="id2" value="{{ diff.ref2 }}" id="id2">
+    <label for="context_lines">Context Lines:</label>
+    <input type="number" name="context_lines" value="{{ context_lines }}" id="context_lines" min="0">
+    <label for="interhunk_lines">Interhunk Lines:</label>
+    <input type="number" name="interhunk_lines" value="{{ interhunk_lines }}" id="interhunk_lines" min="0">
+    <button type="submit">Update Diff</button>
+</form>
+
 <h2>Changed Files</h2>
-<ul>
-    {% for file in diff.files %}
-    <li>{{ file.file }}: +{{ file.additions }} -{{ file.deletions }} ({{ file.status }})</li>
-    {% endfor %}
-</ul>
+<table>
+    <thead>
+        <tr>
+            <th>File</th>
+            <th>Additions</th>
+            <th>Deletions</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for file in diff.files %}
+        <tr>
+            <td>{{ file.file }}</td>
+            <td style="color: green;">+{{ file.additions }}</td>
+            <td style="color: red;">-{{ file.deletions }}</td>
+            <td>{{ file.status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 <h2>Full Patch</h2>
-<pre>
-    {{ diff.patch }}
-</pre>
+<div>
+{{ highlighted_patch|safe }}
+</div>
+{% endif %}
 {% endblock %}
