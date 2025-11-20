@@ -3,11 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Py GitWeb</title>
+    <title>Lipasto</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Repositories</h1>
+    <h1>
+        Lipasto
+    </h1>
+    <p>
+        A git interface for repositories. In development. Currently supports basic git pluming features, and views commits, trees, blobs, diffs and refs. Feautres like stats, commit signature verification, grep, submodules, auth, sql db integration are planned.  
+    </p>
+    <h2>Repositories</h2>
     <ul>
         {% for repo in repos %}
             <li><a href="{{ url_for('repo_detail', repo_name=repo.name) }}">{{ repo.name }}</a></li>

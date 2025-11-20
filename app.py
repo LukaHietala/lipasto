@@ -46,8 +46,9 @@ def index():
 
 @app.route("/<repo_name>")
 def repo_detail(repo_name):
+    commits = get_commits(f"{repo_path}/{repo_name}", ref="HEAD", max_count=10)
     refs = get_refs(f"{repo_path}/{repo_name}")
-    return render_template("repo.html", repo_name=repo_name, refs=refs)
+    return render_template("repo.html", repo_name=repo_name, refs=refs, commits=commits)
 
 @app.route("/<repo_name>/commits")
 def repo_commits(repo_name):

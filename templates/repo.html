@@ -2,5 +2,31 @@
 
 {% block content %}
 <h1>Repository: {{ repo_name }}</h1>
-<img src="{{ url_for('static', filename='cat.png') }}" alt="cat">
+<h2>Latest commits</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Commit</th>
+            <th>Message</th>
+            <th>Author</th>
+            <th>Date</th>
+            <th>Files Changed</th>
+            <th>Insertions</th>
+            <th>Deletions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for commit in commits %}
+            <tr>
+                <td><a href="{{ url_for('commit_detail', repo_name=repo_name, commit_id=commit.id) }}">{{ commit.id[:8] }}</a></td>
+                <td>{{ commit.message }}</td>
+                <td>{{ commit.author.name }}</td>
+                <td>{{ commit.date | datetime }}</td>
+                <td>{{ commit.diff_stats.files_changed }}</td>
+                <td>{{ commit.diff_stats.insertions }}</td>
+                <td>{{ commit.diff_stats.deletions }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
