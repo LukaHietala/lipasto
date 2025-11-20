@@ -1,5 +1,19 @@
 import pygit2 as git
 
+# map libgit2 delta status to human readable
+status_map = {
+    git.GIT_DELTA_ADDED: 'added',
+    git.GIT_DELTA_DELETED: 'deleted',
+    git.GIT_DELTA_MODIFIED: 'modified',
+    git.GIT_DELTA_RENAMED: 'renamed',
+    git.GIT_DELTA_COPIED: 'copied',
+    git.GIT_DELTA_IGNORED: 'ignored',
+    git.GIT_DELTA_UNTRACKED: 'untracked',
+    git.GIT_DELTA_TYPECHANGE: 'typechange',
+    git.GIT_DELTA_UNREADABLE: 'unreadable',
+    git.GIT_DELTA_CONFLICTED: 'conflicted'
+}
+
 # retrieves commit history for given repo path and reference
 def get_commits(path, ref="HEAD", max_count=None, skip=0):
     repo = git.Repository(path)
@@ -57,6 +71,22 @@ def get_commit(path, commit_id):
             'deletions': stats.deletions,
             'files_changed': stats.files_changed
         }
+        # detect renames and copies
+        diff.find_similar()
+        patches = list(diff)
+        deltas = diff.deltas
+        changed_files = []
+        for i, delta in enumerate(deltas):
+            patch = patches[i]
+            file_path = delta.new_file.path if delta.new_file.path else delta.old_file.path
+            _, additions, deletions = patch.line_stats
+            status_str = status_map.get(delta.status, 'unknown')
+            changed_files.append({
+                'file': file_path,
+                'additions': additions,
+                'deletions': deletions,
+                'status': status_str
+            })
     else:
         diff_stats = {
             'insertions': 0,
@@ -64,6 +94,7 @@ def get_commit(path, commit_id):
             'files_changed': 0
         }
         diff = None
+        changed_files = []
 
     commit_info = {
         'id': str(commit.id),
@@ -74,6 +105,7 @@ def get_commit(path, commit_id):
         'parent_id': str(commit.parents[0].id) if commit.parents else None,
         'date': commit.commit_time,
         'diff_stats': diff_stats,
-        'diff': diff.patch if diff else None
+        'diff': diff.patch if diff else None,
+        'changed_files': changed_files
     }
     return commit_info
