@@ -73,8 +73,21 @@ def age_filter(value):
     else:
         return "just now"
 
+def size_filter(value):
+    if value is None:
+        return ''
+    if value < 1024:
+        return f"{value} B"
+    elif value < 1024 * 1024:
+        return f"{value / 1024:.1f} KB"
+    elif value < 1024 * 1024 * 1024:
+        return f"{value / (1024 * 1024):.1f} MB"
+    else:
+        return f"{value / (1024 * 1024 * 1024):.1f} GB"
+
 app.jinja_env.filters['datetime'] = datetime_filter
 app.jinja_env.filters['age'] = age_filter
+app.jinja_env.filters['size'] = size_filter
 
 @app.route("/")
 def index():

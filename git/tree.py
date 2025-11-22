@@ -40,4 +40,8 @@ def get_tree_items(repo_path, ref="HEAD", tree_path=""):
             'path': entry.name if not tree_path else f"{tree_path}/{entry.name}"
         }
         items.append(item)
+
+    # dirs first, then files, both alphabetically
+    items.sort(key=lambda x: (0 if x['type'] == 'tree' else 1, x['name'].lower()))
+    
     return items

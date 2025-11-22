@@ -2,7 +2,18 @@
 
 {% block content %}
     <h1>Tree for {{ repo_name }} at {{ ref }}{% if path %} / {{ path }}{% endif %}</h1>
-    <table class="list">
+    
+    {% if path %}
+    <div class="breadcrumbs">
+        <a href="{{ url_for('repo_tree_path', repo_name=repo_name) }}?ref={{ ref }}">root</a>
+        {% set parts = path.split('/') %}
+        {% for part in parts %}
+            / <a href="{{ url_for('repo_tree_path', repo_name=repo_name, path=parts[:loop.index]|join('/')) }}?ref={{ ref }}">{{ part }}</a>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <table class="list tree-table">
         <thead>
             <tr>
                 <th>Name</th>
@@ -21,7 +32,7 @@
                         {% endif %}
                     </td>
                     <td>{{ item.type }}</td>
-                    <td>{% if item.type == 'blob' %}{{ item.size }} bytes{% endif %}</td>
+                    <td>{% if item.type == 'blob' %}{{ item.size | size }}{% endif %}</td>
                 </tr>
             {% endfor %}
         </tbody>

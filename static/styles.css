@@ -61,6 +61,11 @@ table {
     width: 100%;
 }
 
+.tree-table {
+    width: auto;
+    max-width: 100%;
+}
+
 th, td {
     border: 1px solid lightgray;
     padding: 4px 8px;
@@ -123,6 +128,29 @@ table.commits-table .message-col {
 .blame-code {
     background-color: #f9f9f9;
     border: 1px solid lightgray;
+    overflow-x: auto;
+}
+
+.breadcrumbs {
+    margin-bottom: 1em;
+    font-size: 14px;
+}
+
+.breadcrumbs a {
+    color: grey;
+}
+
+.tree-table td:first-child {
+    white-space: normal;
+    word-break: break-all;
+}
+
+.blob-content {
+    margin: 0 -1em;
+}
+
+.blob-content pre {
+    white-space: pre-wrap;
     overflow-x: auto;
 }
 

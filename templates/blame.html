@@ -5,7 +5,8 @@
 <style>.blame-code pre { line-height: 0.7; }</style>
 <h1>Blame: {{ path }}</h1>
 <div id="loading">Loading blame information, this may take a while for large files...</div>
-<div id="pomeranian" style="display: none; margin-top: 20px;">
+<div id="pomeranian" style="display: none;">
+    <p>Server is taking its time... anyways, here's a tug of war match between two marshmallows:</p>
     <iframe width="560" height="315" src="https://www.youtube.com/embed/Q-KciIbk_oA?si=c_DqdaVbYMlfhxW7&amp;controls=0&amp;autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 <div id="blame-content" style="display: none;">
@@ -15,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const repo_name = window.location.pathname.split('/')[1];
     const pomeranianTimeout = setTimeout(() => {
         document.getElementById('pomeranian').style.display = 'block';
+        document.getElementById('loading').style.display = 'none';
     }, 5000);
     
     fetch(window.location.href, {
