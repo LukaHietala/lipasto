@@ -1,4 +1,5 @@
 import os
+import subprocess
 from flask import Flask, render_template, request, abort
 from datetime import datetime
 from dotenv import load_dotenv
@@ -141,6 +142,20 @@ def commit_detail(repo_name, commit_id):
         abort(400, "Invalid commit id")
     commit = get_commit(f"{repo_path}/{repo_name}", commit_id)
     return render_template("commit.html", repo_name=repo_name, commit=commit)
+
+@app.route("/<repo_name>/patch/<commit_id>")
+def commit_patch(repo_name, commit_id):
+    if not validate_repo_name(repo_name):
+        abort(404)
+    if not validate_ref_as_commit(f"{repo_path}/{repo_name}", commit_id):
+        abort(400, "Invalid commit id")
+    # Use git format-patch to generate the patch
+    result = subprocess.run(['git', '--git-dir', f"{repo_path}/{repo_name}", 'format-patch', '-1', '--stdout', commit_id], 
+                            capture_output=True, text=True, encoding='utf-8')
+    # git leaves encoded headers like =?UTF-8?Q?...?=, but that should be fine for patch view for now, TODO 
+    if result.returncode != 0:
+        abort(500, f"Failed to generate patch: {result.stderr}")
+    return result.stdout, 200, {'Content-Type': 'text/plain; charset=utf-8'}
 
 @app.route("/<repo_name>/refs")
 def repo_refs(repo_name):

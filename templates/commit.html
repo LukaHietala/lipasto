@@ -31,7 +31,7 @@
         <tbody>
             {% for file in commit.changed_files %}
             <tr>
-                <td>{{ file.file }}</td>
+                <td><a href="{{ url_for('repo_blob_path', repo_name=repo_name, path=file.file) }}?ref={{ commit.id }}">{{ file.file }}</a></td>
                 <td style="color: green;">+{{ file.additions }}</td>
                 <td style="color: red;">-{{ file.deletions }}</td>
                 <td>{{ file.status }}</td>
@@ -40,7 +40,7 @@
         </tbody>
     </table>
     {% if commit.parent_id %}
-    <p><a href="{{ url_for('repo_diff', repo_name=repo_name) }}?id1={{ commit.parent_id }}&id2={{ commit.id }}">View Full Diff</a></p>
+    <p><a href="{{ url_for('repo_diff', repo_name=repo_name) }}?id1={{ commit.parent_id }}&id2={{ commit.id }}">View Full Diff</a> | <a href="{{ url_for('commit_patch', repo_name=repo_name, commit_id=commit.id) }}">Patch</a></p>
     {% endif %}
     {% else %}
     <p>No changes compared to parent</p>
