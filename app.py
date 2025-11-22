@@ -104,7 +104,16 @@ def repo_detail(repo_name):
         abort(400, "Invalid ref")
     commits = get_commits(f"{repo_path}/{repo_name}", ref=ref, max_count=10)
     refs = get_refs(f"{repo_path}/{repo_name}")
-    return render_template("repo.html", repo_name=repo_name, refs=refs, commits=commits)
+    readme = None
+    for filename in ['README.md', 'README']:
+        try:
+            readme_blob = get_blob(f"{repo_path}/{repo_name}", ref, filename)
+            if readme_blob:
+                readme = readme_blob['content']
+                break
+        except:
+            pass
+    return render_template("repo.html", repo_name=repo_name, refs=refs, commits=commits, readme=readme)
 
 @app.route("/<repo_name>/commits")
 def repo_commits(repo_name):

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Repository: {{ repo_name }}</h1>
+<h1>{{ repo_name }}</h1>
 <h2>Latest commits</h2>
 <table class="commits-table">
     <thead>
@@ -15,18 +15,22 @@
     </thead>
     <tbody>
         {% for commit in commits %}
-            <tr>
-                <td class="commit-col"><a href="{{ url_for('commit_detail', repo_name=repo_name, commit_id=commit.id) }}">{{ commit.id[:8] }}</a></td>
-                <td class="message-col">{{ commit.message }}</td>
-                <td class="author-col">{{ commit.author.name }}</td>
-                <td class="age-col">{{ commit.date | age }}</td>
-                <td class="changes-col">
-                    <span class="files-changed">{{ commit.diff_stats.files_changed }} file{% if commit.diff_stats.files_changed != 1 %}s{% endif %}</span>
-                    <span class="insertions">+{{ commit.diff_stats.insertions }}</span>
-                    <span class="deletions">-{{ commit.diff_stats.deletions }}</span>
-                </td>
-            </tr>
+        <tr>
+            <td class="commit-col"><a href="{{ url_for('commit_detail', repo_name=repo_name, commit_id=commit.id) }}">{{ commit.id[:8] }}</a></td>
+            <td class="message-col">{{ commit.message }}</td>
+            <td class="author-col">{{ commit.author.name }}</td>
+            <td class="age-col">{{ commit.date | age }}</td>
+            <td class="changes-col">
+                <span class="files-changed">{{ commit.diff_stats.files_changed }} file{% if commit.diff_stats.files_changed != 1 %}s{% endif %}</span>
+                <span class="insertions">+{{ commit.diff_stats.insertions }}</span>
+                <span class="deletions">-{{ commit.diff_stats.deletions }}</span>
+            </td>
+        </tr>
         {% endfor %}
     </tbody>
 </table>
+{% if readme %}
+<h2>README</h2>
+<pre class="readme-box">{{ readme }}</pre>
+{% endif %}
 {% endblock %}

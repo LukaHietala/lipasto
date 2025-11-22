@@ -154,5 +154,15 @@ table.commits-table .message-col {
     overflow-x: auto;
 }
 
+.readme-box {
+    border: 1px solid lightgray;
+    padding: 1em;
+    margin: 0.5em 0;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    overflow-x: auto;
+}
+
 
 
