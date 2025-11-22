@@ -16,7 +16,7 @@
             {% for commit in commits %}
             <tr>
                 <td class="commit-col"><a href="{{ url_for('commit_detail', repo_name=repo_name, commit_id=commit.id) }}">{{ commit.id[:8] }}</a></td>
-                <td class="message-col">{{ commit.message }}</td>
+                <td class="message-col" title="{{ commit.message }}">{{ commit.message }}</td>
                 <td class="author-col">{{ commit.author.name }}</td>
                 <td class="age-col">{{ commit.date | age }}</td>
                 <td class="changes-col">
