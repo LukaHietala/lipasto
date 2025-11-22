@@ -19,7 +19,12 @@ def get_commits(path, ref="HEAD", max_count=None, skip=0):
     repo = git.Repository(path)
     commits = []
     # TODO: accept blob oids to filter commits that touch specific blobs
-    walker = repo.walk(repo.revparse_single(ref).id, git.GIT_SORT_TIME)
+    obj = repo.revparse_single(ref)
+    if obj.type == git.GIT_OBJECT_COMMIT:
+        commit = obj
+    else:
+        commit = obj.peel(git.GIT_OBJECT_COMMIT)
+    walker = repo.walk(commit.id, git.GIT_SORT_TIME)
 
     n = 0
     for commit in walker:
