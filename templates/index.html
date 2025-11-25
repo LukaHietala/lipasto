@@ -23,7 +23,7 @@
     <h2>Repositories</h2>
     <div style="display: flex; flex-direction: column; gap: 8px;">
         {% for repo in repos %}
-            <div style="padding: 16px; background-color: #f9f9f9; border-radius: 8px;">
+            <div style="padding: 16px; background-color: #f9f9f9; ">
                 <h4 style="margin: 0 0 8px 0;"><a href="{{ url_for('repo_detail', repo_name=repo.name) }}" style="font-weight: normal;">{{ repo.name }}</a></h4>
                 {% if repo.description %}
                     <p style="margin: 0; color: gray; font-size: 14px;">{{ repo.description }}</p>
