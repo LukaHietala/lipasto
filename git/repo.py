@@ -12,9 +12,17 @@ def get_bare_repos(path):
             try:
                 repo = git.Repository(str(item))
                 if repo.is_bare:
+                    description = ""
+                    desc_file = item / "description"
+                    if desc_file.exists():
+                        try:
+                            description = desc_file.read_text().strip()
+                        except:
+                            pass
                     repo_info = {
                         "name": item.name,
-                        "path": str(item.resolve())
+                        "path": str(item.resolve()),
+                        "description": description
                     }
                     repos.append(repo_info)
             except git.GitError:

@@ -21,11 +21,18 @@
         A git interface for repositories. In development. Currently supports basic git pluming features, and views commits, trees, blobs, diffs and refs. Feautres like stats, commit signature verification, grep, submodules, auth, sql db integration are planned.  
     </p>
     <h2>Repositories</h2>
-    <ul>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
         {% for repo in repos %}
-            <li><a href="{{ url_for('repo_detail', repo_name=repo.name) }}">{{ repo.name }}</a></li>
+            <div style="padding: 16px; background-color: #f9f9f9; border-radius: 8px;">
+                <h4 style="margin: 0 0 8px 0;"><a href="{{ url_for('repo_detail', repo_name=repo.name) }}" style="font-weight: normal;">{{ repo.name }}</a></h4>
+                {% if repo.description %}
+                    <p style="margin: 0; color: gray; font-size: 14px;">{{ repo.description }}</p>
+                {% else %}
+                    <p style="margin: 0; color: gray; font-size: 14px; font-style: italic;">No description available</p>
+                {% endif %}
+            </div>
         {% endfor %}
-    </ul>
+    </div>
     <small>
         Libgit2 - {{ version }}  git 
     </small>
