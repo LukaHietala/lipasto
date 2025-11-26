@@ -1,5 +1,7 @@
 Fast webview using pygit2 (lib2git) bindings. For my personal use, for now
 
+BETTER DOCS SOON
+
 <img width="1280" height="960" alt="image" src="https://github.com/user-attachments/assets/1ce40e5f-1eed-4085-a1b4-698aac9c557f" />
 
 ## Setup
@@ -39,6 +41,20 @@ server {
       proxy_pass http://unix:/home/USERNAME/lipasto/py-gitweb.sock;
    }
 }
+
+# if gitdaemon
+location ~ ^/git/([^/]+)(/.*)?$ {
+   include fastcgi_params;
+   fastcgi_param SCRIPT_FILENAME /usr/lib/git-core/git-http-backend;
+   fastcgi_param GIT_PROJECT_ROOT /srv/git;
+   fastcgi_param GIT_HTTP_EXPORT_ALL "1";
+   fastcgi_param PATH_INFO /$1$2;
+   fastcgi_param REQUEST_METHOD $request_method;
+   fastcgi_param QUERY_STRING $query_string;
+   fastcgi_pass unix:/var/run/fcgiwrap.socket;
+}
+
+# sudo apt install fcgiwrap spawn-fcgi
 ```
 
 Note: Libgit2 might have some issues with git.safe dir settings. If you run into issues, try setting `git config --global --add safe.directory '*'`
