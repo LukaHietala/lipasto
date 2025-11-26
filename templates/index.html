@@ -7,31 +7,37 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         body {
-            max-width: 800px;
+            max-width: 1200px;
             margin: auto;
-            padding: 1em; 
+            padding: 1em;
         }
     </style>
 </head>
 <body>
-    <h1>
-        Lipasto
-    </h1>
-    <p>
-        A git interface for repositories. In development. Currently supports basic git pluming features, and views commits, trees, blobs, diffs and refs. Feautres like stats, commit signature verification, grep, submodules, auth, sql db integration are planned.  
-    </p>
-    <h2>Repositories</h2>
-    <div style="display: flex; flex-direction: column; gap: 8px;">
-        {% for repo in repos %}
-            <div style="padding: 16px; background-color: #f9f9f9; ">
-                <h4 style="margin: 0 0 8px 0;"><a href="{{ url_for('repo_detail', repo_name=repo.name) }}" style="font-weight: normal;">{{ repo.name }}</a></h4>
-                {% if repo.description %}
-                    <p style="margin: 0; color: gray; font-size: 14px;">{{ repo.description }}</p>
-                {% else %}
-                    <p style="margin: 0; color: gray; font-size: 14px; font-style: italic;">No description available</p>
-                {% endif %}
+    <div class="main-layout">
+        <div>
+            <h1>
+                Lipasto
+            </h1>
+            <p>
+                A git web interface for repositories. Currently supports viewing commits, trees, blobs, diffs, and references.
+            </p>
+        </div>
+        <div>
+            <h2>Repositories</h2>
+            <div class="repos-grid">
+                {% for repo in repos %}
+                    <div class="repo-card">
+                        <h4><a href="{{ url_for('repo_detail', repo_name=repo.name) }}">{{ repo.name }}</a></h4>
+                        {% if repo.description %}
+                            <p>{{ repo.description }}</p>
+                        {% else %}
+                            <p>-</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+        </div>
     </div>
     <small>
         Libgit2 - {{ version }}  git 
