@@ -32,8 +32,8 @@
                 {% for repo in repos %}
                     <div class="repo-card">
                         <h4><a href="{{ url_for('repo_detail', repo_name=repo.name) }}">{{ repo.name }}</a></h4>
-                        {% if repo.description %}
-                            <p>{{ repo.description }}</p>
+                        {% if repo.owner %}
+                            <p>{{ repo.owner }}</p>
                         {% else %}
                             <p>-</p>
                         {% endif %}
