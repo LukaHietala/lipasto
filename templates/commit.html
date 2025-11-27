@@ -1,25 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Commit {{ commit.id }}</h1>
-    <p>Message: {{ commit.message }}</p>
-    <p>Author: {{ commit.author.name }} &lt;{{ commit.author.email }}&gt;</p>
-    <p>Committer: {{ commit.committer.name }} &lt;{{ commit.committer.email }}&gt;</p>
-    <p>Date: {{ commit.date | datetime }}</p>
-    {% if commit.parent_id %}
-    <p>Parent: <a href="{{ url_for('commit_detail', repo_name=repo_name, commit_id=commit.parent_id) }}">{{ commit.parent_id }}</a></p>
-    {% endif %}
-    <p>Tree: <a href="{{ url_for('repo_tree_path', repo_name=repo_name, path='') }}?ref={{ commit.tree_id }}">{{ commit.tree_id }}</a></p>
-    <p><a href="{{ url_for('repo_tree_path', repo_name=repo_name, path='') }}?ref={{ commit.id }}">View Tree</a></p>
+    <h1>commit {{ commit.id }}</h1>
+        Author: {{ commit.author.name }} &lt;{{ commit.author.email }}&gt;<br>
+        Committer: {{ commit.committer.name }} &lt;{{ commit.committer.email }}&gt;<br>
+        Date: {{ commit.date | datetime }}
+        {% if commit.parent_id %}<br>
+        Parent: <a href="{{ url_for('commit_detail', repo_name=repo_name, commit_id=commit.parent_id) }}">{{ commit.parent_id }}</a>
+        {% endif %}<br>
+        Tree: <a href="{{ url_for('repo_tree_path', repo_name=repo_name, path='') }}?ref={{ commit.tree_id }}">{{ commit.tree_id }}</a>
+        <div class="commit-message">
+            {{ commit.message }}
+        </div>
+        <a href="{{ url_for('repo_tree_path', repo_name=repo_name, path='') }}?ref={{ commit.id }}">View Tree</a>
     {% if commit.diff %}
-    <h2>Diff Stats</h2>
-    <ul>
-        <li>Files Changed: {{ commit.diff_stats.files_changed }}</li>
-        <li>Insertions: {{ commit.diff_stats.insertions }}</li>
-        <li>Deletions: {{ commit.diff_stats.deletions }}</li>
-    </ul>
     <h2>Changed Files</h2>
-    <table>
+    <table class="changed-files-table">
         <thead>
             <tr>
                 <th>File</th>
@@ -32,15 +28,18 @@
             {% for file in commit.changed_files %}
             <tr>
                 <td><a href="{{ url_for('repo_blob_path', repo_name=repo_name, path=file.file) }}?ref={{ commit.id }}">{{ file.file }}</a></td>
-                <td style="color: green;">+{{ file.additions }}</td>
-                <td style="color: red;">-{{ file.deletions }}</td>
+                <td class="insertions">+{{ file.additions }}</td>
+                <td class="deletions">-{{ file.deletions }}</td>
                 <td>{{ file.status }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
     {% if commit.parent_id %}
-    <p><a href="{{ url_for('repo_diff', repo_name=repo_name) }}?id1={{ commit.parent_id }}&id2={{ commit.id }}">View Full Diff</a> | <a href="{{ url_for('commit_patch', repo_name=repo_name, commit_id=commit.id) }}">Patch</a></p>
+    <div>
+        <a href="{{ url_for('repo_diff', repo_name=repo_name) }}?id1={{ commit.parent_id }}&id2={{ commit.id }}">View Full Diff</a> | 
+        <a href="{{ url_for('commit_patch', repo_name=repo_name, commit_id=commit.id) }}">Patch</a>
+    </div>
     {% endif %}
     {% else %}
     <p>No changes compared to parent</p>
