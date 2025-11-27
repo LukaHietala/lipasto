@@ -9,7 +9,7 @@
 <body>
     <nav>
         <div>
-            <a href="/">Back</a>
+            <a href="/">Home</a>
             {% set repo_name = request.view_args.get('repo_name') %}
             {% if repo_name %}
             <a href="{{ url_for('repo_detail', repo_name=repo_name) }}?ref={{ current_ref }}" {% if request.endpoint == 'repo_detail' %}class="active"{% endif %}>Overview</a>
