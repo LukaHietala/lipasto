@@ -1,13 +1,11 @@
 from pathlib import Path
 import pygit2 as git
-import os
-from .db import init_db, get_owner
+
+from .config import get_repo_owner
 
 # scans given path for bare git repos and list their names and paths
 def get_bare_repos(path):
     repos = []
-    db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'lipasto.db')
-    init_db(db_path)
 
     repo_path = Path(path)
 
@@ -23,7 +21,7 @@ def get_bare_repos(path):
                             description = desc_file.read_text().strip()
                         except:
                             pass
-                    owner = get_owner(db_path, item.name)
+                    owner = get_repo_owner(item)
                     repo_info = {
                         "name": item.name,
                         "path": str(item.resolve()),
