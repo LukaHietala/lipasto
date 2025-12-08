@@ -1,7 +1,6 @@
 import os
 import subprocess
 from flask import Flask, render_template, request, abort
-from datetime import datetime
 from dotenv import load_dotenv
 
 from git.repo import get_bare_repos
@@ -13,6 +12,7 @@ from git.misc import get_version, validate_repo_name, validate_ref, validate_ref
 from git.diff import get_diff
 from git.blame import get_blame
 from highlight import highlight_diff
+from filters import register_filters
 
 load_dotenv()
 
@@ -20,6 +20,7 @@ app = Flask(__name__)
 
 # for base.html
 app.jinja_env.globals['request'] = request
+register_filters(app)
 
 @app.context_processor
 def inject_current_ref():
@@ -35,60 +36,6 @@ def inject_current_ref():
     return {'current_ref': ref}
 
 repo_path = os.getenv('GIT_REPO_PATH')
-
-def datetime_filter(value, format='%Y-%m-%d %H:%M:%S'):
-    if isinstance(value, datetime):
-        # format regular datetime 
-        return value.strftime(format)
-    elif isinstance(value, (int, float)):
-        # if not datetime, but number, try to convert
-        # just assume its unix timestamp, git uses that
-        dt = datetime.fromtimestamp(value)
-        return dt.strftime(format)
-    return value
-
-# age filter to show relative time like "2 days ago" 
-def age_filter(value):
-    if isinstance(value, (int, float)):
-        dt = datetime.fromtimestamp(value)
-    elif isinstance(value, datetime):
-        dt = value
-    else:
-        return value
-    now = datetime.now()
-    diff = now - dt
-    if diff.days > 365:
-        years = diff.days // 365
-        return f"{years} year{'s' if years != 1 else ''} ago"
-    elif diff.days > 30:
-        months = diff.days // 30
-        return f"{months} month{'s' if months != 1 else ''} ago"
-    elif diff.days > 0:
-        return f"{diff.days} day{'s' if diff.days != 1 else ''} ago"
-    elif diff.seconds > 3600:
-        hours = diff.seconds // 3600
-        return f"{hours} hour{'s' if hours != 1 else ''} ago"
-    elif diff.seconds > 60:
-        minutes = diff.seconds // 60
-        return f"{minutes} minute{'s' if minutes != 1 else ''} ago"
-    else:
-        return "just now"
-
-def size_filter(value):
-    if value is None:
-        return ''
-    if value < 1024:
-        return f"{value} B"
-    elif value < 1024 * 1024:
-        return f"{value / 1024:.1f} KB"
-    elif value < 1024 * 1024 * 1024:
-        return f"{value / (1024 * 1024):.1f} MB"
-    else:
-        return f"{value / (1024 * 1024 * 1024):.1f} GB"
-
-app.jinja_env.filters['datetime'] = datetime_filter
-app.jinja_env.filters['age'] = age_filter
-app.jinja_env.filters['size'] = size_filter
 
 @app.route("/")
 def index():
