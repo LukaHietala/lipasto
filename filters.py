@@ -1,7 +1,7 @@
 from datetime import datetime
 
 
-# Filter to format datetime objects or timestamps as strings (2025-12-08 12:18:21 )
+# filter to format datetime objects or timestamps as strings (2025-12-08 12:18:21 )
 def datetime_filter(value, format="%Y-%m-%d %H:%M:%S"):
     if isinstance(value, datetime):
         return value.strftime(format)
@@ -11,7 +11,7 @@ def datetime_filter(value, format="%Y-%m-%d %H:%M:%S"):
     return value
 
 
-# Filter to display age in human-readable format (like "2 days ago", "3 hours ago")
+# filter to display age in human-readable format (like "2 days ago", "3 hours ago")
 def age_filter(value):
     if isinstance(value, (int, float)):
         dt = datetime.fromtimestamp(value)
@@ -38,7 +38,7 @@ def age_filter(value):
     return "just now"
 
 
-# Filter to display file sizes in human-readable format (bytes to KB, MB, GB)
+# filter to display file sizes in human-readable format (bytes to KB, MB, GB)
 def size_filter(value):
     if value is None:
         return ""
@@ -51,7 +51,7 @@ def size_filter(value):
     return f"{value / (1024 * 1024 * 1024):.1f} GB"
 
 
-# Register filters with Flask app
+# register filters with Flask app
 def register_filters(app):
     app.jinja_env.filters["datetime"] = datetime_filter
     app.jinja_env.filters["age"] = age_filter

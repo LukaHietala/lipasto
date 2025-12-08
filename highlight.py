@@ -1,62 +1,62 @@
 from pygments import highlight
-from pygments.util import ClassNotFound
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import DiffLexer
 from pygments.lexers import TextLexer
 from pygments.lexers import guess_lexer
 from pygments.lexers import guess_lexer_for_filename
-from pygments.lexers import DiffLexer
-from pygments.formatters import HtmlFormatter
+from pygments.util import ClassNotFound
 
-# server-side syntax highlighting
+STYLE = "sas"
+
 
 # reference: https://git.kernel.org/pub/scm/infra/cgit.git/tree/filters/syntax-highlighting.py?id=dbaee2672be14374acb17266477c19294c6155f3
+def _safe_lexer(content, filename):
+    try:
+        return guess_lexer_for_filename(filename, content)
+    except ClassNotFound:
+        if content.startswith("#!"):
+            return guess_lexer(content)
+        return TextLexer()
+    except TypeError:
+        return TextLexer()
+
+
+def _formatter(*, linenos=False, cssclass=None, nowrap=False):
+    return HtmlFormatter(
+        style=STYLE,
+        nobackground=True,
+        linenos=linenos,
+        cssclass=cssclass,
+        nowrap=nowrap,
+    )
+
+
+# highlight code with filename-based lexer
 def highlight_code(data, filename):
-    formatter = HtmlFormatter(style='sas', nobackground=True, linenos=True)
-    try:
-        lexer = guess_lexer_for_filename(filename, data)
-    except ClassNotFound:
-        if data.startswith('#!'):
-            lexer = guess_lexer(data)
-        else:
-            lexer = TextLexer()
-    except TypeError:
-        lexer = TextLexer()
-    css = formatter.get_style_defs('.highlight')
-    highlighted = highlight(data, lexer, formatter)
-    return f'<style>{css}</style>{highlighted}'
+    formatter = _formatter(linenos=True)
+    css = formatter.get_style_defs(".highlight")
+    highlighted = highlight(data, _safe_lexer(data, filename), formatter)
+    return f"<style>{css}</style>{highlighted}"
 
+
+# get CSS styles for blame view
 def get_highlight_blame_style():
-    formatter = HtmlFormatter(style='sas', nobackground=True, cssclass='blame-code')
-    return formatter.get_style_defs('.blame-code')
+    formatter = _formatter(cssclass="blame-code")
+    return formatter.get_style_defs(".blame-code")
 
-# highlight a single line (for blame)
+
+# highlight a single line of code with filename-based lexer
 def highlight_line(line, filename):
-    formatter = HtmlFormatter(style='sas', nobackground=True, cssclass='blame-code')
-    try:
-        lexer = guess_lexer_for_filename(filename, line)
-    except ClassNotFound:
-        if line.startswith('#!'):
-            lexer = guess_lexer(line)
-        else:
-            lexer = TextLexer()
-    except TypeError:
-        lexer = TextLexer()
-    highlighted = highlight(line, lexer, formatter)
-    # remove the outer div and pre
-    # highlighted is <div class="blame-code"><pre>mirri</pre></div>
-    # extract inner
-    start = highlighted.find('<pre>') + 5 # length of <pre>, very hacky i know
-    end = highlighted.find('</pre>')
-    return highlighted[start:end]
+    # Use nowrap to avoid wrapping in <div><pre>...</pre></div>
+    formatter = _formatter(cssclass="blame-code", nowrap=True)
+    return highlight(line, _safe_lexer(line, filename), formatter)
 
-# bare diff highlighting
+
+# highlight diff with DiffLexer
 def highlight_diff(data):
-    formatter = HtmlFormatter(style='sas', nobackground=True)
-    lexer = DiffLexer()
-    highlighted = highlight(data, lexer, formatter)
-    # replace default pygments classes with custom ones
-    # classes are from pygments DiffLexer, generic tokens
-    # gd = general deleted, gi = general inserted, gh = general hunk, gu = hunk header?
-    # https://pygments.org/docs/tokens/
+    formatter = _formatter()
+    highlighted = highlight(data, DiffLexer(), formatter)
+    # gd = removed, gi = added, gh = hunk, gu = header
     highlighted = highlighted.replace('class="gd"', 'class="diff-removed"')
     highlighted = highlighted.replace('class="gi"', 'class="diff-added"')
     highlighted = highlighted.replace('class="gh"', 'class="diff-hunk"')
@@ -67,4 +67,4 @@ def highlight_diff(data):
     .diff-hunk { background-color: lightgray; }
     .diff-header { color: blue; font-weight: bold; }
     """
-    return f'<style>{css}</style>{highlighted}'
+    return f"<style>{css}</style>{highlighted}"
