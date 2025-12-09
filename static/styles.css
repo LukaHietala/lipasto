@@ -150,37 +150,3 @@ table.commits-table .message-col {
 .commit-message {
     margin: 1em 0;
 }
-
-/* index */
-.main-layout {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 2em;
-}
-
-.repos-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-}
-
-.repo-card {
-    padding: 16px;
-    background-color: #f9f9f9;
-}
-
-.repo-card h4 {
-    margin: 0 0 8px 0;
-}
-
-.repo-card h4 a {
-    font-weight: normal;
-}
-
-.repo-card p {
-    margin: 0;
-    color: gray;
-    font-size: 14px;
-}
-
-

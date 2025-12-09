@@ -3,7 +3,7 @@ import subprocess
 from flask import Flask, render_template, request, abort
 from dotenv import load_dotenv
 
-from git.repo import get_bare_repos
+from git.repository import get_bare_repos
 from git.commit import get_commits, get_commit
 from git.ref import get_refs
 from git.tree import get_tree_items

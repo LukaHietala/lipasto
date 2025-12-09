@@ -4,43 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lipasto</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <style>
-        body {
-            max-width: 1200px;
-            margin: auto;
-            padding: 1em;
-        }
-    </style>
 </head>
 <body>
-    <div class="main-layout">
-        <div>
-            <h1>
-                Lipasto
-            </h1>
-            <p>
-                A git web interface for repositories. Currently supports viewing commits, trees, blobs, diffs, and references.
-            </p>
-            <small>
-                Libgit2 - {{ version }}  git 
-            </small>
-        </div>
-        <div>
-            <h2>Repositories</h2>
-            <div class="repos-grid">
-                {% for repo in repos %}
-                    <div class="repo-card">
-                        <h4><a href="{{ url_for('repo_detail', repo_name=repo.name) }}">{{ repo.name }}</a></h4>
-                        {% if repo.owner %}
-                            <p>{{ repo.owner }}</p>
-                        {% else %}
-                            <p>-</p>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
+    <h2>Repositories</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Repository</th>
+                <th>Owner</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for repo in repos %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('repo_detail', repo_name=repo.name) }}">
+                        {{ repo.name }}
+                    </a>
+                </td>
+                <td>
+                    {% if repo.owner %}
+                    {{ repo.owner }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if repo.description %}
+                    {{ repo.description }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <small>
+        libgit2 - {{ version }}
+    </small>
 </body>
 </html>
