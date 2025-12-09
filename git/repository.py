@@ -1,7 +1,7 @@
 from pathlib import Path
 import pygit2 as git
 
-from .config import get_repo_owner
+from .config import get_repo_owner, is_repo_hidden
 
 
 # scans given path for bare git repos and list their names and paths
@@ -21,6 +21,9 @@ def get_bare_repos(path):
 
         repo = _safe_repository(item)
         if not repo or not repo.is_bare:
+            continue
+
+        if is_repo_hidden(item):
             continue
 
         description = _read_description(item / "description")

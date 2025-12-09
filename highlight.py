@@ -6,7 +6,7 @@ from pygments.lexers import guess_lexer
 from pygments.lexers import guess_lexer_for_filename
 from pygments.util import ClassNotFound
 
-STYLE = "sas"
+STYLE = "default"
 
 
 # reference: https://git.kernel.org/pub/scm/infra/cgit.git/tree/filters/syntax-highlighting.py?id=dbaee2672be14374acb17266477c19294c6155f3
