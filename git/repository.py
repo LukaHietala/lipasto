@@ -34,6 +34,14 @@ def get_bare_repos(path):
             }
         )
 
+    repos.sort(
+        # sort by owner (empty last), then by owner name, then by repo name
+        key=lambda repo: (
+            not (repo.get("owner") or "").strip(),
+            (repo.get("owner") or "").lower(),
+            repo["name"].lower(),
+        )
+    )
     return repos
 
 
