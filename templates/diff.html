@@ -1,14 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Diff</h1>
-
 {% if error %}
-<p style="color: red;">Error: {{ error }}</p>
+<p>Error: {{ error }}</p>
 {% endif %}
 
 {% if diff %}
-<h1>Diff between {{ diff.ref1 }} ({{ diff.ref1_id[:7] }}) and {{ diff.ref2 }} ({{ diff.ref2_id[:7] }})</h1>
+<h2>Diff between {{ diff.ref1 }} and {{ diff.ref2 }}</h2>
 
 <form method="get" action="">
     <label for="id1">From:</label>
@@ -22,14 +20,14 @@
     <button type="submit">Update Diff</button>
 </form>
 
-<h2>Changed Files</h2>
+<h3>Changed Files</h3>
 <table>
-    <thead>
+    <thead style="font-weight: bold;">
         <tr>
-            <th>File</th>
-            <th>Additions</th>
-            <th>Deletions</th>
-            <th>Status</th>
+            <td>File</td>
+            <td>Additions</td>
+            <td>Deletions</td>
+            <td>Status</td>
         </tr>
     </thead>
     <tbody>
@@ -44,7 +42,7 @@
     </tbody>
 </table>
 
-<h2>Full Patch</h2>
+<h3>Full Patch</h3>
 <div>
 {{ highlighted_patch|safe }}
 </div>

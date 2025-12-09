@@ -22,13 +22,15 @@ def _safe_lexer(content, filename):
 
 
 def _formatter(*, linenos=False, cssclass=None, nowrap=False):
-    return HtmlFormatter(
-        style=STYLE,
-        nobackground=True,
-        linenos=linenos,
-        cssclass=cssclass,
-        nowrap=nowrap,
-    )
+    formatter_kwargs = {
+        "style": STYLE,
+        "nobackground": True,
+        "linenos": linenos,
+        "nowrap": nowrap,
+    }
+    if cssclass:
+        formatter_kwargs["cssclass"] = cssclass
+    return HtmlFormatter(**formatter_kwargs)
 
 
 # highlight code with filename-based lexer

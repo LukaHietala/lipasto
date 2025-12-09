@@ -61,7 +61,7 @@ def repo_detail(repo_name):
                 break
         except:
             pass
-    return render_template("repo.html", repo_name=repo_name, refs=refs, commits=commits, readme=readme)
+    return render_template("overview.html", repo_name=repo_name, refs=refs, commits=commits, readme=readme)
 
 @app.route("/<repo_name>/commits")
 def repo_commits(repo_name):

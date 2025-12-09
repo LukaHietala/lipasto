@@ -1,24 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Tree for {{ repo_name }} at {{ ref }}{% if path %} / {{ path }}{% endif %}</h1>
-    
+    <h2>Tree</h2>
     {% if path %}
-    <div class="breadcrumbs">
+    <p>
         <a href="{{ url_for('repo_tree_path', repo_name=repo_name) }}?ref={{ ref }}">root</a>
         {% set parts = path.split('/') %}
         {% for part in parts %}
             / <a href="{{ url_for('repo_tree_path', repo_name=repo_name, path=parts[:loop.index]|join('/')) }}?ref={{ ref }}">{{ part }}</a>
         {% endfor %}
-    </div>
+    </p>
     {% endif %}
     
-    <table class="list tree-table">
+    <table>
         <thead>
-            <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Size</th>
+            <tr style="font-weight: bold;">
+                <td>Name</td>
+                <td>Type</td>
+                <td>Size</td>
             </tr>
         </thead>
         <tbody>

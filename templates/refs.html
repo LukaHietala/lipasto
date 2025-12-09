@@ -1,21 +1,25 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Refs for {{ repo_name }}</h1>
-    <table class="list">
+    <h2>References</h2>
+    <table>
         <thead>
-            <tr>
-                <th>Name</th>
-                <th>Target</th>
-                <th>Actions</th>
+            <tr style="font-weight: bold;">
+                <td>Name</td>
+                <td>Target</td>
+                <td>Author</td>
+                <td>Age</td>
+                <td>Actions</td>
             </tr>
         </thead>
         <tbody>
             {% for ref in refs %}
                 <tr>
-                    <td>{{ ref.name }}</td>
-                    <td>{{ ref.target }}</td>
-                    <td><a href="{{ url_for('repo_tree_path', repo_name=repo_name, path='') }}?ref={{ ref.shorthand }}">View Tree</a></td>
+                    <td valign="top" nowrap>{{ ref.name }}</td>
+                    <td valign="top" nowrap>{{ ref.target[:8] }}</td>
+                    <td valign="top" nowrap>{{ ref.author.name if ref.author else 'N/A' }}</td>
+                    <td valign="top" nowrap>{{ ref.date | age if ref.date else 'N/A' }}</td>
+                    <td valign="top" nowrap><a href="{{ url_for('repo_tree_path', repo_name=repo_name, path='') }}?ref={{ ref.shorthand }}">View Tree</a></td>
                 </tr>
             {% endfor %}
         </tbody>
