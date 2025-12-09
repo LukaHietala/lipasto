@@ -5,18 +5,32 @@
 <h2>Blame: {{ path }}</h2>
 <div id="loading">Loading blame information, this may take a while for large files...</div>
 <div id="pomeranian" style="display: none;">
-    <p>Server is taking its time... anyways, here's a tug of war match between two marshmallows:</p>
+    <p>Server is taking its time... anyways, here's a tug of war match between two toasted pomeranians:</p>
     <iframe width="560" height="315" src="https://www.youtube.com/embed/Q-KciIbk_oA?si=c_DqdaVbYMlfhxW7&amp;controls=0&amp;autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 <div id="blame-content" style="display: none;">
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const repo_name = window.location.pathname.split('/')[1];
-    const pomeranianTimeout = setTimeout(() => {
-        document.getElementById('pomeranian').style.display = 'block';
-        document.getElementById('loading').style.display = 'none';
-    }, 5000);
+    const repoName = window.location.pathname.split('/')[1];
+    const loading = document.getElementById('loading');
+    const pomeranian = document.getElementById('pomeranian');
+    const pomeranianIframe = pomeranian.querySelector('iframe');
+    const blameContent = document.getElementById('blame-content');
+
+    const showPomeranian = () => {
+        loading.style.display = 'none';
+        pomeranian.style.display = 'block';
+    };
+
+    const hidePomeranian = () => {
+        pomeranian.style.display = 'none';
+        if (pomeranianIframe) {
+            pomeranianIframe.src = 'about:blank';
+        }
+    };
+
+    const pomeranianTimeout = setTimeout(showPomeranian, 5000);
     
     fetch(window.location.href, {
         headers: {
@@ -35,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
             data.blame.forEach(line => {
                 content += `${String(line.line_num).padStart(4)} `;
                 if (line.blame) {
-                    content += `<a href="/${repo_name}/commits/${line.blame.commit_id}">${line.blame.commit_id.substring(0, 8)}</a> ${line.blame.author.name.substring(0, 15).padEnd(15)} ${new Date(line.blame.author.time * 1000).toISOString().slice(0, 19).replace('T', ' ')}`;
+                    content += `<a href="/${repoName}/commits/${line.blame.commit_id}">${line.blame.commit_id.substring(0, 8)}</a> ${line.blame.author.name.substring(0, 15).padEnd(15)} ${new Date(line.blame.author.time * 1000).toISOString().slice(0, 19).replace('T', ' ')}`;
                 }
                 content += ` | ${line.highlighted}\n`;
             });
@@ -44,24 +58,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         content += '</pre></div>';
         
-        document.getElementById('blame-content').innerHTML = content;
-        document.getElementById('loading').style.display = 'none';
-        // clear iframe
-        const iframe = document.querySelector('#pomeranian iframe');
-        if (iframe) {
-            iframe.src = 'about:blank';
-        }
-        document.getElementById('pomeranian').style.display = 'none';
-        document.getElementById('blame-content').style.display = 'block';
+        blameContent.innerHTML = content;
+        loading.style.display = 'none';
+        hidePomeranian();
+        blameContent.style.display = 'block';
     })
     .catch(error => {
         clearTimeout(pomeranianTimeout);
-        document.getElementById('loading').innerHTML = 'Error loading blame';
-        const iframe = document.querySelector('#pomeranian iframe');
-        if (iframe) {
-            iframe.src = 'about:blank';
-        }
-        document.getElementById('pomeranian').style.display = 'none';
+        loading.innerHTML = 'Error loading blame';
+        hidePomeranian();
     });
 });
 </script>
