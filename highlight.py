@@ -41,19 +41,6 @@ def highlight_code(data, filename):
     return f"<style>{css}</style>{highlighted}"
 
 
-# get CSS styles for blame view
-def get_highlight_blame_style():
-    formatter = _formatter(cssclass="blame-code")
-    return formatter.get_style_defs(".blame-code")
-
-
-# highlight a single line of code with filename-based lexer
-def highlight_line(line, filename):
-    # Use nowrap to avoid wrapping in <div><pre>...</pre></div>
-    formatter = _formatter(cssclass="blame-code", nowrap=True)
-    return highlight(line, _safe_lexer(line, filename), formatter)
-
-
 # highlight diff with DiffLexer
 def highlight_diff(data):
     formatter = _formatter()

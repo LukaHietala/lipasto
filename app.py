@@ -1,6 +1,6 @@
 import os
 import subprocess
-from flask import Flask, render_template, request, abort
+from flask import Flask, render_template, request, abort, redirect, url_for
 from dotenv import load_dotenv
 
 from git.repository import get_bare_repos
@@ -10,7 +10,6 @@ from git.tree import get_tree_items
 from git.blob import get_blob
 from git.misc import get_version, validate_repo_name, validate_ref, validate_ref_as_commit, sanitize_path
 from git.diff import get_diff
-from git.blame import get_blame
 from highlight import highlight_diff
 from filters import register_filters
 
@@ -50,18 +49,7 @@ def repo_detail(repo_name):
     ref = request.args.get('ref', 'HEAD').strip()
     if not validate_ref_as_commit(f"{repo_path}/{repo_name}", ref):
         abort(400, "Invalid ref")
-    commits = get_commits(f"{repo_path}/{repo_name}", ref=ref, max_count=10)
-    refs = get_references(f"{repo_path}/{repo_name}")
-    readme = None
-    for filename in ['README.md', 'README']:
-        try:
-            readme_blob = get_blob(f"{repo_path}/{repo_name}", ref, filename)
-            if readme_blob:
-                readme = readme_blob['content']
-                break
-        except:
-            pass
-    return render_template("overview.html", repo_name=repo_name, refs=refs, commits=commits, readme=readme)
+    return redirect(url_for('repo_commits', repo_name=repo_name, ref=ref))
 
 @app.route("/<repo_name>/commits")
 def repo_commits(repo_name):
@@ -141,27 +129,6 @@ def repo_blob_path(repo_name, path):
     refs = get_references(f"{repo_path}/{repo_name}")
     blob = get_blob(f"{repo_path}/{repo_name}", ref, path)
     return render_template("blob.html", repo_name=repo_name, ref=ref, path=path, blob=blob, refs=refs)
-
-@app.route("/<repo_name>/blame/<path:path>")
-def repo_blame_path(repo_name, path):
-    if not validate_repo_name(repo_name):
-        abort(404)
-    ref = request.args.get('ref', 'HEAD').strip()
-    if not validate_ref(f"{repo_path}/{repo_name}", ref):
-        abort(400, "Invalid ref")
-    try:
-        path = sanitize_path(path)
-    except ValueError:
-        abort(400, "Invalid path")
-    refs = get_references(f"{repo_path}/{repo_name}")
-    
-    # if ajax (for loading)
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        blame, style = get_blame(f"{repo_path}/{repo_name}", ref, path)
-        return {'blame': blame, 'style': style}
-    
-    # initial
-    return render_template("blame.html", repo_name=repo_name, ref=ref, path=path, refs=refs)
 
 @app.route("/<repo_name>/diff")
 def repo_diff(repo_name):

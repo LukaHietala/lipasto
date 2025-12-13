@@ -19,12 +19,15 @@ def get_commits(path, ref="HEAD", max_count=None, skip=0):
     repo = git.Repository(path)
     commits = []
     # TODO: accept blob oids to filter commits that touch specific blobs
-    obj = repo.revparse_single(ref)
-    if obj.type == git.GIT_OBJECT_COMMIT:
-        commit = obj
-    else:
-        commit = obj.peel(git.GIT_OBJECT_COMMIT)
-    walker = repo.walk(commit.id, git.GIT_SORT_TIME)
+    try:
+        obj = repo.revparse_single(ref)
+    except Exception:
+        # PYGIT DOES NOT REURN LIBGIT ERRORS!??! >:(
+        # only generic exception....
+        return [], f"invalid reference"
+    
+    # revwalk
+    walker = repo.walk(obj.id, git.GIT_SORT_TIME)
 
     n = 0
     for commit in walker:

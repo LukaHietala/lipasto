@@ -1,3 +1,3 @@
 Fast, minimal git webview. Using Libgit2 as git backend
 
-- Browse bare repos with commit history, refs, trees, blobs, diffs, patches, and blame views
+- Browse bare repos with commit history, refs, trees, blobs, diffs, and patches

@@ -19,7 +19,7 @@
             {% for repo in repos %}
             <tr>
                 <td>
-                    <a href="{{ url_for('repo_detail', repo_name=repo.name) }}">
+                    <a href="{{ url_for('repo_commits', repo_name=repo.name) }}">
                         {{ repo.name }}
                     </a>
                 </td>
