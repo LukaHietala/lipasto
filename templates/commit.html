@@ -1,40 +1,37 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>commit {{ commit.id }}</h1>
-        Author: {{ commit.author.name }} &lt;{{ commit.author.email }}&gt;<br>
-        Committer: {{ commit.committer.name }} &lt;{{ commit.committer.email }}&gt;<br>
-        Date: {{ commit.date | datetime }}
-        {% if commit.parent_id %}<br>
-        Parent: <a href="{{ url_for('commit_detail', repo_name=repo_name, commit_id=commit.parent_id) }}">{{ commit.parent_id }}</a>
-        {% endif %}<br>
-        Tree: <a href="{{ url_for('repo_tree_path', repo_name=repo_name, path='') }}?ref={{ commit.tree_id }}">{{ commit.tree_id }}</a>
-        <div>
-            {{ commit.message }}
-        </div>
-        <a href="{{ url_for('repo_tree_path', repo_name=repo_name, path='') }}?ref={{ commit.id }}">View Tree</a>
+    <header>
+        <b>Commit:</b> <a href="{{ url_for('commit_detail', repo_name=repo_name, commit_id=commit.id) }}">{{ commit.id }}</a><br>
+        {% if commit.parent_id %}
+        <b>Parent:</b> <a href="{{ url_for('commit_detail', repo_name=repo_name, commit_id=commit.parent_id) }}">{{ commit.parent_id }}</a><br>
+        {% endif %}
+        <b>Author:</b> {{ commit.author.name }} &lt;{{ commit.author.email }}&gt;<br>
+        <b>Committer:</b> {{ commit.committer.name }} &lt;{{ commit.committer.email }}&gt;<br>
+        <b>Date:</b> {{ commit.date | datetime }}<br>
+        <b>Tree:</b> <a href="{{ url_for('repo_tree_path', repo_name=repo_name, path='') }}?ref={{ commit.tree_id }}">{{ commit.tree_id }}</a>
+    </header>
+    <p>{{ commit.message }}</p>
     {% if commit.diff %}
-    <h2>Changed Files</h2>
+    <h2>Diffstat</h2>
     <table>
-        <thead>
-            <tr>
-                <th>File</th>
-                <th>Additions</th>
-                <th>Deletions</th>
-                <th>Status</th>
-            </tr>
-        </thead>
         <tbody>
             {% for file in commit.changed_files %}
+            {% set status_letter = {'added':'A','deleted':'D','modified':'M','renamed':'R','copied':'C','typechange':'T'}.get(file.status, '?') %}
+            {% set total = file.additions + file.deletions %}
+            {% set plus_len = [file.additions, 40] | min %}
+            {% set minus_len = [file.deletions, 40] | min %}
             <tr>
+                <td class="status {{ status_letter }}">{{ status_letter }}</td>
                 <td><a href="{{ url_for('repo_blob_path', repo_name=repo_name, path=file.file) }}?ref={{ commit.id }}">{{ file.file }}</a></td>
-                <td>+{{ file.additions }}</td>
-                <td>-{{ file.deletions }}</td>
-                <td>{{ file.status }}</td>
+                <td>|</td>
+                <td>{{ total }}</td>
+                <td><span style="color: green;">{{ '+' * plus_len }}</span><span style="color: red;">{{ '- ' * minus_len }}</span></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    <p>{{ commit.diff_stats.files_changed }} files changed, {{ commit.diff_stats.insertions }} insertions(+), {{ commit.diff_stats.deletions }} deletions(-)</p>
     {% if commit.parent_id %}
     <div>
         <a href="{{ url_for('repo_diff', repo_name=repo_name) }}?id1={{ commit.parent_id }}&id2={{ commit.id }}">View Full Diff</a> | 
