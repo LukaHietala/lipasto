@@ -1,36 +1,42 @@
 package main
 
 import (
-	"fmt"
+	"html/template"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/lukahietala/lipasto/git"
 )
 
 func main() {
+	tmpl, err := template.ParseGlob("./templates/*.html")
+	if err != nil {
+		log.Fatalf("Unable to parse templates: %v\n", err)
+	}
+
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "Hello! 🐹")
 		repos, err := git.ListRepositories("/tmp/repos")
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Failed to fetch repos: %v", err), http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		paths := make([]string, 0, len(repos))
-		for _, r := range repos {
-			paths = append(paths, r.Path)
+		err = tmpl.ExecuteTemplate(w, "index.html", map[string]any{
+			"Repos": repos,
+		})
+		if err != nil {
+			log.Printf("%v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		fmt.Fprintf(w, "%v", strings.Join(paths, ", "))
 	})
 
 	port := ":8080"
 	server := &http.Server{
-		Addr:    ":8080",
+		Addr:    port,
 		Handler: mux,
 	}
+
 	log.Printf("Listening on %s\n", port)
 	log.Fatal(server.ListenAndServe())
 }
