@@ -17,7 +17,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		repos, err := git.ListRepositories("/tmp/repos")
+		repos, err := git.ListRepositories("/tmp/git-test/")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

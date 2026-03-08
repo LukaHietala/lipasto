@@ -7,7 +7,7 @@
     <body>
        <ul>
         {{ range .Repos }}
-            <li>{{ .Path }}</li>
+            <li>{{ .Path }} {{ .Name }}</li>
         {{ else }}
             <li>No repositories found</li>
         {{ end }}

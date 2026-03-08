@@ -1,36 +1,64 @@
 package git
 
 import (
-	gogit "github.com/go-git/go-git/v6"
-	"io/fs"
+	"os"
 	"path/filepath"
+	"strings"
+
+	gogit "github.com/go-git/go-git/v6"
 )
 
 type Repository struct {
+	// Name of the repository, derived from Path
+	Name string
 	// Path to the repo on disk
 	Path string
 	// Gogit repository representation
-	gogitRepo *gogit.Repository
+	*gogit.Repository
 }
 
-// Returns a slice of all repositories in spesified directory
+// ListRepositories finds all repos in a directory
 func ListRepositories(root string) ([]*Repository, error) {
 	var repos []*Repository
-	err := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
-		if err != nil || !d.IsDir() {
-			return nil
+
+	paths, err := os.ReadDir(root)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, path := range paths {
+		if !path.IsDir() {
+			continue
 		}
-		// Make sure it's a valid git repo
-		r, err := gogit.PlainOpen(path)
+		repoPath := filepath.Join(root, path.Name())
+
+		r, err := gogit.PlainOpen(repoPath)
 		if err == nil {
 			repos = append(repos, &Repository{
-				Path:      path,
-				gogitRepo: r,
+				// TODO?: With .git it looks cooler, so maybe change
+				Name:       strings.TrimSuffix(path.Name(), ".git"),
+				Path:       repoPath,
+				Repository: r,
 			})
-			// Don't go any deeper
-			return filepath.SkipDir
 		}
-		return nil
-	})
-	return repos, err
+	}
+
+	return repos, nil
+}
+
+// LatestCommit returns the latest commit pointed to by HEAD
+func (r *Repository) LatestCommit() (*Commit, error) {
+	ref, err := r.Head()
+	if err != nil {
+		return nil, err
+	}
+
+	obj, err := r.CommitObject(ref.Hash())
+	if err != nil {
+		return nil, err
+	}
+
+	return &Commit{
+		Commit: obj,
+	}, nil
 }
