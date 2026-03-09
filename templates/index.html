@@ -3,13 +3,16 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/static/styles.css">
     </head>
     <body>
-       <ul>
+        <ul>
         {{ range .Repos }}
-            <li>{{ .Path }} {{ .Name }}</li>
-        {{ else }}
-            <li>No repositories found</li>
+            <li>
+                <a href="{{ .Name }}">{{ .Name }}</a>
+                <span>{{ .Description }}</span>
+                <span> - Last updated {{ .LatestCommit.Author.When | humanizeTime }}</span>
+            </li>
         {{ end }}
         </ul> 
     </body>

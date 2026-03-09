@@ -1,0 +1,16 @@
+:root {
+  --primary: #045c64;
+}
+
+* {
+    font-family: sans-serif;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}

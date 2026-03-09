@@ -62,3 +62,45 @@ func (r *Repository) LatestCommit() (*Commit, error) {
 		Commit: obj,
 	}, nil
 }
+
+// Git's placeholder description
+const defaultDescription = "Unnamed repository; edit this file 'description' to name the repository."
+
+// Description returns the repo description found in file ".git/description" or "description"
+func (r *Repository) Description() (string, error) {
+	// On bare repos
+	descPath := filepath.Join(r.Path, "description")
+
+	// On regular repos (TODO?: Don't support regular repos)
+	if _, err := os.Stat(descPath); os.IsNotExist(err) {
+		descPath = filepath.Join(r.Path, ".git", "description")
+	}
+
+	data, err := os.ReadFile(descPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return "", nil
+		}
+		return "", err
+	}
+	desc := strings.TrimSpace(string(data))
+
+	if desc == defaultDescription {
+		return "", nil
+	}
+
+	return desc, nil
+}
+
+// Owner returns owner definded in .git/config (gitweb.owner)
+func (r *Repository) Owner() (string, error) {
+	cfg, err := r.Config()
+	if err != nil {
+		return "", err
+	}
+
+	// Looks for:
+	// [gitweb]
+	//     owner = "Laukkaava pomeranian"
+	return cfg.Raw.Section("gitweb").Option("owner"), nil
+}
