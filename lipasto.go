@@ -1,42 +1,40 @@
 package main
 
 import (
+	"bytes"
 	"html/template"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/dustin/go-humanize"
 	"github.com/lukahietala/lipasto/git"
 )
 
-type loggingResponseWriter struct {
-	http.ResponseWriter
-	statusCode int
+// TODO: Common error handling
+
+type app struct {
+	tmpl *template.Template
 }
 
-// TODO: Hacky method shadowing so maybe refactor if possible
-func (lrw *loggingResponseWriter) WriteHeader(code int) {
-	lrw.statusCode = code
-	lrw.ResponseWriter.WriteHeader(code)
-}
+func (app *app) handleIndex(w http.ResponseWriter, r *http.Request) {
+	repos, err := git.ListRepositories("/tmp/git-test/")
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		log.Printf("%v", err)
+		return
+	}
 
-func logger(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-
-		lrw := &loggingResponseWriter{w, http.StatusOK}
-
-		next.ServeHTTP(lrw, r)
-
-		log.Printf(
-			"%s %s %d %s",
-			r.Method,
-			r.URL.Path,
-			lrw.statusCode,
-			time.Since(start),
-		)
+	var buf bytes.Buffer
+	err = app.tmpl.ExecuteTemplate(&buf, "index.html", map[string]any{
+		"Repos": repos,
 	})
+	if err != nil {
+		log.Printf("%v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	buf.WriteTo(w)
 }
 
 func main() {
@@ -50,32 +48,25 @@ func main() {
 		log.Fatalf("Unable to parse templates: %v\n", err)
 	}
 
+	app := &app{
+		tmpl: tmpl,
+	}
+
 	mux := http.NewServeMux()
 
 	fs := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
-		repos, err := git.ListRepositories("/tmp/git-test/")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		err = tmpl.ExecuteTemplate(w, "index.html", map[string]any{
-			"Repos": repos,
-		})
-		if err != nil {
-			log.Printf("%v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	})
+	mux.HandleFunc("GET /{$}", app.handleIndex)
 
 	port := ":8080"
 	server := &http.Server{
 		Addr:    port,
-		Handler: logger(mux),
+		Handler: withLogging(mux),
 	}
 
 	log.Printf("Listening on %s\n", port)
-	log.Fatal(server.ListenAndServe())
+	if err := server.ListenAndServe(); err != nil {
+		log.Fatalf("%v", err)
+	}
 }
