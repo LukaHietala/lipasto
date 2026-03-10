@@ -9,10 +9,12 @@
         <ul>
         {{ range .Repos }}
             <li>
-                <a href="{{ .Name }}">{{ .Name }}</a>
+                <a href="/r/{{ .Name }}/commits">{{ .Name }}</a>
                 <span>{{ .Description }}</span>
-                <span> - Last updated {{ .LatestCommit.Author.When | humanizeTime }}</span>
+                <span> - Last updated {{ .LastUpdated | humanizeTime }}</span>
             </li>
+        {{ else }}
+            <p>No repositories found</p>
         {{ end }}
         </ul> 
     </body>

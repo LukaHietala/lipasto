@@ -1,9 +1,15 @@
 :root {
-  --primary: #045c64;
+    --primary: #045c64;
+    --gray: #525252;
 }
 
 * {
     font-family: sans-serif;
+}
+
+body {
+    max-width: 800px;
+    margin: 20px auto;
 }
 
 a {
@@ -13,4 +19,44 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+
+/* Commit table */
+.commit-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border: 0;
+}
+
+.commit-table th,
+.commit-table td {
+    padding: 6px;
+    vertical-align: top;
+    text-align: left;
+}
+
+.col-hash {
+    width: 80px;
+}
+.col-message {
+    width: auto;
+}
+.col-date {
+    width: 120px;
+}
+
+.cell-hash,
+.cell-date {
+    white-space: nowrap;
+}
+
+.message-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.author-label {
+    color: var(--gray);
 }

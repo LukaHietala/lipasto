@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    {{ if .Commits }}
+    <table class="commit-table">
+        <thead>
+            <tr>
+                <th class="col-hash">Hash</th>
+                <th class="col-message">Commit Message</th>
+                <th class="col-date">Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Commits }}
+            <tr>
+                <td class="cell-hash">
+                    <a href="#">{{ .ShortHash }}</a>
+                </td>
+                <td class="cell-message">
+                    <div class="message-text" title="{{ .Message }}">
+                        {{ .Message }}
+                    </div>
+                    <small class="author-label">by {{ .Author.Name }}</small>
+                </td>
+                <td class="cell-date">
+                    {{ .Author.When | humanizeTime }}
+                </td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+    {{ else }}
+    <p>Nothing to see</p>
+    {{ end }}
+</body>
+</html>
