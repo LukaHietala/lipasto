@@ -62,36 +62,44 @@ func (r *Repository) LastUpdated() time.Time {
 	return commit.Author.When
 }
 
-// TODO: Add pagination
-// Commits returns slice of commits in repo reference
-func (r *Repository) Commits(ref *Reference) ([]*Commit, error) {
+// Commits returns a paginated slice of commits and a boolean indicating if more commits exist
+func (r *Repository) Commits(ref *Reference, page int, pageSize int) ([]*Commit, bool, error) {
 	cIter, err := r.raw.Log(&gogit.LogOptions{
 		From:  ref.Hash(),
 		Order: gogit.LogOrderCommitterTime,
 	})
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	defer cIter.Close()
 
 	var commits []*Commit
+	skip := (page - 1) * pageSize
+	hasNext := false
 
-	// Normally go-git's ForEach shoud be used but that's disgusting
-	for {
+	for i := 0; ; i++ {
 		c, err := cIter.Next()
 		if err != nil {
 			if err == io.EOF {
 				break
 			}
-			return nil, err
+			return nil, false, err
 		}
 
-		commits = append(commits, &Commit{
-			Commit: c,
-		})
+		// Skip commits until on right page
+		if i < skip {
+			continue
+		}
+
+		if len(commits) == pageSize {
+			hasNext = true
+			break
+		}
+
+		commits = append(commits, &Commit{Commit: c})
 	}
 
-	return commits, nil
+	return commits, hasNext, nil
 }
 
 // Git's placeholder description

@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/dustin/go-humanize"
@@ -45,19 +46,23 @@ func (app *app) handleIndex(w http.ResponseWriter, r *http.Request) {
 func (app *app) handleCommits(w http.ResponseWriter, r *http.Request) {
 	name := r.PathValue("repo")
 
+	pageStr := r.URL.Query().Get("page")
+	page, _ := strconv.Atoi(pageStr)
+	if page < 1 {
+		page = 1
+	}
+	pageSize := 50
+
 	repo, err := git.FindRepository(root, name)
 	if err != nil {
 		if errors.Is(err, git.ErrRepositoryNotFound) {
 			http.Error(w, "Repository not found", http.StatusBadRequest)
 		} else {
-			log.Printf("%v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
 	}
-
-	var commits []*git.Commit
-	// TODO: Make resolve ref and take ?ref query param
+	// TODO: Resolve other refs, ?ref=
 	head, err := repo.CurrentHead()
 	if err != nil {
 		if errors.Is(err, plumbing.ErrReferenceNotFound) {
@@ -69,17 +74,26 @@ func (app *app) handleCommits(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	var commits []*git.Commit
+	var hasNext bool
 	if head != nil {
-		commits, err = repo.Commits(head)
+		commits, hasNext, err = repo.Commits(head, page, pageSize)
 		if err != nil {
 			http.Error(w, "Unable to list commits", http.StatusInternalServerError)
 			return
 		}
 	}
+
 	var buf bytes.Buffer
 	err = app.tmpl.ExecuteTemplate(&buf, "commits.html", map[string]any{
-		"Commits": commits,
+		"Commits":     commits,
+		"CurrentPage": page,
+		"HasNext":     hasNext,
+		"HasPrev":     page > 1,
+		"NextPage":    page + 1,
+		"PrevPage":    page - 1,
 	})
+
 	if err != nil {
 		log.Printf("%v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

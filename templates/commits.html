@@ -22,6 +22,7 @@
                     <a href="#">{{ .ShortHash }}</a>
                 </td>
                 <td class="cell-message">
+                    <!-- div soup because default styles RUIN everything :(-->
                     <div class="message-text" title="{{ .Message }}">
                         {{ .Message }}
                     </div>
@@ -34,6 +35,15 @@
             {{ end }}
         </tbody>
     </table>
+    <section class="pagination">
+        {{ if .HasPrev }}
+            <a href="?page={{ .PrevPage }}">[Back]</a>
+        {{ end }}
+        {{ .CurrentPage }}
+        {{ if .HasNext }}
+            <a href="?page={{ .NextPage }}">[Next]</a>
+        {{ end }}
+    </section>
     {{ else }}
     <p>Nothing to see</p>
     {{ end }}
