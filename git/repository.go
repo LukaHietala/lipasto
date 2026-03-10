@@ -22,12 +22,12 @@ type Repository struct {
 	// Path to the repo on disk
 	Path string
 	// Gogit repository representation
-	*gogit.Repository
+	raw *gogit.Repository
 }
 
 // CurrentHead returns HEAD reference
 func (r *Repository) CurrentHead() (*Reference, error) {
-	ref, err := r.Head()
+	ref, err := r.raw.Head()
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (r *Repository) CurrentHead() (*Reference, error) {
 
 // LatestCommit returns the latest commit pointed to by HEAD
 func (r *Repository) LatestCommit() (*Commit, error) {
-	ref, err := r.Head()
+	ref, err := r.raw.Head()
 	if err != nil {
 		if errors.Is(err, plumbing.ErrReferenceNotFound) {
 			return nil, nil // Empty repo
@@ -44,7 +44,7 @@ func (r *Repository) LatestCommit() (*Commit, error) {
 		return nil, err
 	}
 
-	obj, err := r.CommitObject(ref.Hash())
+	obj, err := r.raw.CommitObject(ref.Hash())
 	if err != nil {
 		return nil, err
 	}
@@ -65,8 +65,9 @@ func (r *Repository) LastUpdated() time.Time {
 // TODO: Add pagination
 // Commits returns slice of commits in repo reference
 func (r *Repository) Commits(ref *Reference) ([]*Commit, error) {
-	cIter, err := r.Log(&gogit.LogOptions{
-		From: ref.Hash(),
+	cIter, err := r.raw.Log(&gogit.LogOptions{
+		From:  ref.Hash(),
+		Order: gogit.LogOrderCommitterTime,
 	})
 	if err != nil {
 		return nil, err
@@ -124,7 +125,7 @@ func (r *Repository) Description() (string, error) {
 
 // Owner returns owner definded in .git/config (gitweb.owner)
 func (r *Repository) Owner() (string, error) {
-	cfg, err := r.Config()
+	cfg, err := r.raw.Config()
 	if err != nil {
 		return "", err
 	}
@@ -154,9 +155,9 @@ func ListRepositories(root string) ([]*Repository, error) {
 		if err == nil {
 			repos = append(repos, &Repository{
 				// TODO?: With .git it looks cooler, so maybe change
-				Name:       strings.TrimSuffix(path.Name(), ".git"),
-				Path:       repoPath,
-				Repository: r,
+				Name: strings.TrimSuffix(path.Name(), ".git"),
+				Path: repoPath,
+				raw:  r,
 			})
 		}
 	}
