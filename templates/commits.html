@@ -19,7 +19,7 @@
             {{ range .Commits }}
             <tr>
                 <td class="cell-hash">
-                    <a href="#">{{ .ShortHash }}</a>
+                    <a href="{{ .Hash }}">{{ .ShortHash }}</a>
                 </td>
                 <td class="cell-message">
                     <!-- div soup because default styles RUIN everything :(-->

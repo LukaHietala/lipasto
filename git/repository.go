@@ -102,6 +102,20 @@ func (r *Repository) Commits(hash plumbing.Hash, page int, pageSize int) ([]*Com
 	return commits, hasNext, nil
 }
 
+// GetCommit returns a Commit based on hash
+func (r *Repository) GetCommit(hash string) (*Commit, error) {
+	h := plumbing.NewHash(hash)
+
+	obj, err := r.raw.CommitObject(h)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Commit{
+		Commit: obj,
+	}, nil
+}
+
 // ResolveRevision resolves a generic string (hash, short branch name, tag, or full ref)
 // and returns the corresponding commit
 func (r *Repository) ResolveRevision(rev string) (*Commit, error) {

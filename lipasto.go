@@ -102,6 +102,7 @@ func (app *app) handleCommits(w http.ResponseWriter, r *http.Request) {
 
 	var buf bytes.Buffer
 	err = app.tmpl.ExecuteTemplate(&buf, "commits.html", map[string]any{
+		"Repo":        repo,
 		"Commits":     commits,
 		"CurrentPage": page,
 		"HasNext":     hasNext,
@@ -109,6 +110,44 @@ func (app *app) handleCommits(w http.ResponseWriter, r *http.Request) {
 		"NextPage":    page + 1,
 		"PrevPage":    page - 1,
 		"Ref":         refQuery,
+	})
+
+	if err != nil {
+		log.Printf("%v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	buf.WriteTo(w)
+}
+
+func (app *app) handleCommit(w http.ResponseWriter, r *http.Request) {
+	name := r.PathValue("repo")
+	commitHash := r.PathValue("commit")
+
+	repo, err := git.FindRepository(root, name)
+	if err != nil {
+		if errors.Is(err, git.ErrRepositoryNotFound) {
+			http.Error(w, "Repository not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	commit, err := repo.GetCommit(commitHash)
+	if err != nil {
+		if errors.Is(err, plumbing.ErrObjectNotFound) {
+			http.Error(w, "Unable to find commit", http.StatusNotFound)
+		} else {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	var buf bytes.Buffer
+	err = app.tmpl.ExecuteTemplate(&buf, "commit.html", map[string]any{
+		"Commit": commit,
 	})
 
 	if err != nil {
@@ -150,6 +189,7 @@ func main() {
 	mux.HandleFunc("GET /{$}", app.handleIndex)
 	// Mux screams about conflict with static if not promoted to /r/
 	mux.HandleFunc("GET /r/{repo}/commits/{$}", app.handleCommits)
+	mux.HandleFunc("GET /r/{repo}/commits/{commit}/{$}", app.handleCommit)
 
 	port := ":8080"
 	server := &http.Server{
