@@ -1,13 +1,11 @@
 :root {
     --primary: #045c64;
     --gray: #525252;
-}
-
-* {
-    font-family: sans-serif;
+    --light-gray: #ddd;
 }
 
 body {
+    font-family: sans-serif;
     max-width: 800px;
     margin: 20px auto;
 }
@@ -19,6 +17,12 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+
+pre {
+    font-size: 13px;
+    line-height: 1.5;
+    font-family: monospace;
 }
 
 /* Commit table */
@@ -66,4 +70,31 @@ a:hover {
     justify-content: center;
     width: 100%;
     gap: 25px;
+}
+
+/* TODO: Make more common */
+/* TODO: Make line nums sticky */
+.diff-container {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    border-top: 1px solid var(--light-gray);
+    border-bottom: 1px solid var(--light-gray);
+    margin-top: 20px;
+    overflow-x: auto;
+    box-sizing: border-box;
+    padding: 20px;
+}
+
+.diff-container span[id^="L"]:hover a {
+    color: #000 !important;
+    cursor: pointer;
+}
+
+.diff-container span[id^="L"]:target a {
+    color: #000 !important;
+    font-weight: bold !important;
 }

@@ -6,6 +6,9 @@
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-        <div>{{ .Commit.Message }}</div>
+    {{ .Commit.Message }}
+    <div class="diff-container">
+        {{ .Diff }}
+    </div>
 </body>
 </html>
