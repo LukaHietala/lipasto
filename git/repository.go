@@ -63,9 +63,9 @@ func (r *Repository) LastUpdated() time.Time {
 }
 
 // Commits returns a paginated slice of commits and a boolean indicating if more commits exist
-func (r *Repository) Commits(ref *Reference, page int, pageSize int) ([]*Commit, bool, error) {
+func (r *Repository) Commits(hash plumbing.Hash, page int, pageSize int) ([]*Commit, bool, error) {
 	cIter, err := r.raw.Log(&gogit.LogOptions{
-		From:  ref.Hash(),
+		From:  hash,
 		Order: gogit.LogOrderCommitterTime,
 	})
 	if err != nil {
@@ -100,6 +100,24 @@ func (r *Repository) Commits(ref *Reference, page int, pageSize int) ([]*Commit,
 	}
 
 	return commits, hasNext, nil
+}
+
+// ResolveRevision resolves a generic string (hash, short branch name, tag, or full ref)
+// and returns the corresponding commit
+func (r *Repository) ResolveRevision(rev string) (*Commit, error) {
+	hash, err := r.raw.ResolveRevision(plumbing.Revision(rev))
+	if err != nil {
+		return nil, err
+	}
+
+	obj, err := r.raw.CommitObject(*hash)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Commit{
+		Commit: obj,
+	}, nil
 }
 
 // Git's placeholder description

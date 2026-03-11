@@ -45,6 +45,7 @@ func (app *app) handleIndex(w http.ResponseWriter, r *http.Request) {
 
 func (app *app) handleCommits(w http.ResponseWriter, r *http.Request) {
 	name := r.PathValue("repo")
+	refQuery := r.URL.Query().Get("ref")
 
 	pageStr := r.URL.Query().Get("page")
 	page, _ := strconv.Atoi(pageStr)
@@ -56,28 +57,43 @@ func (app *app) handleCommits(w http.ResponseWriter, r *http.Request) {
 	repo, err := git.FindRepository(root, name)
 	if err != nil {
 		if errors.Is(err, git.ErrRepositoryNotFound) {
-			http.Error(w, "Repository not found", http.StatusBadRequest)
+			http.Error(w, "Repository not found", http.StatusNotFound)
 		} else {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
 	}
-	// TODO: Resolve other refs, ?ref=
-	head, err := repo.CurrentHead()
-	if err != nil {
-		if errors.Is(err, plumbing.ErrReferenceNotFound) {
-			head = nil
-		} else {
-			// Should not happen
-			http.Error(w, "Could not determine HEAD", http.StatusInternalServerError)
+
+	// Starting hash for the commit log, from some ?ref or HEAD
+	var startHash plumbing.Hash
+	var hasValidStart bool
+
+	if refQuery != "" {
+		commit, err := repo.ResolveRevision(refQuery)
+		if err != nil {
+			http.Error(w, "Reference not found", http.StatusNotFound)
 			return
+		}
+		startHash = commit.Hash
+		hasValidStart = true
+	} else {
+		// Default to HEAD if no ?ref= is provided
+		head, err := repo.CurrentHead()
+		if err != nil {
+			if !errors.Is(err, plumbing.ErrReferenceNotFound) {
+				http.Error(w, "Could not determine HEAD", http.StatusInternalServerError)
+				return
+			}
+		} else if head != nil {
+			startHash = head.Hash()
+			hasValidStart = true
 		}
 	}
 
 	var commits []*git.Commit
 	var hasNext bool
-	if head != nil {
-		commits, hasNext, err = repo.Commits(head, page, pageSize)
+	if hasValidStart {
+		commits, hasNext, err = repo.Commits(startHash, page, pageSize)
 		if err != nil {
 			http.Error(w, "Unable to list commits", http.StatusInternalServerError)
 			return
@@ -92,6 +108,7 @@ func (app *app) handleCommits(w http.ResponseWriter, r *http.Request) {
 		"HasPrev":     page > 1,
 		"NextPage":    page + 1,
 		"PrevPage":    page - 1,
+		"Ref":         refQuery,
 	})
 
 	if err != nil {

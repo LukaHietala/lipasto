@@ -37,11 +37,11 @@
     </table>
     <section class="pagination">
         {{ if .HasPrev }}
-            <a href="?page={{ .PrevPage }}">[Back]</a>
+            <a href="?page={{ .PrevPage }}&ref={{ .Ref }}">[Back]</a>
         {{ end }}
         {{ .CurrentPage }}
         {{ if .HasNext }}
-            <a href="?page={{ .NextPage }}">[Next]</a>
+            <a href="?page={{ .NextPage }}&ref={{ .Ref }}">[Next]</a>
         {{ end }}
     </section>
     {{ else }}
