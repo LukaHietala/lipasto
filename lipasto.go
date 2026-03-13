@@ -9,45 +9,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/alecthomas/chroma/v2/formatters/html"
-	"github.com/alecthomas/chroma/v2/lexers"
-	"github.com/alecthomas/chroma/v2/styles"
 	"github.com/dustin/go-humanize"
 	"github.com/go-git/go-git/v6/plumbing"
 	"github.com/lukahietala/lipasto/git"
 )
 
-// TODO: Common error handling
-
 const root = "/tmp/git-test/"
 
 type app struct {
 	tmpl *template.Template
-}
-
-// TODO: More common later
-func highlightDiff(diff string) (template.HTML, error) {
-	lexer := lexers.Get("diff")
-	style := styles.Get("trac")
-	formatter := html.New(
-		html.WithClasses(false),
-		html.LineNumbersInTable(true),
-		html.WithLineNumbers(true),
-		html.WithLinkableLineNumbers(true, "L"), // IDs like #L1, #L2
-	)
-
-	iter, err := lexer.Tokenise(nil, diff)
-	if err != nil {
-		return "", err
-	}
-
-	var buf bytes.Buffer
-	err = formatter.Format(&buf, style, iter)
-	if err != nil {
-		return "", err
-	}
-
-	return template.HTML(buf.String()), nil
 }
 
 func (app *app) handleIndex(w http.ResponseWriter, r *http.Request) {
@@ -174,18 +144,11 @@ func (app *app) handleCommit(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var buf bytes.Buffer
-	patch, err := repo.GetPatch(commit)
-	if err != nil {
-		log.Printf("Patch error: %v", err)
-	}
-
-	// Errors don't matter :katti:
-	highlighted, _ := highlightDiff(patch)
-
 	err = app.tmpl.ExecuteTemplate(&buf, "commit.html", map[string]any{
-		"Commit": commit,
-		"Diff":   highlighted,
+		"RepoName": name,
+		"Commit":   commit,
 	})
+
 	if err != nil {
 		log.Printf("%v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

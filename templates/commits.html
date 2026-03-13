@@ -11,8 +11,8 @@
         <thead>
             <tr>
                 <th class="col-hash">Hash</th>
-                <th class="col-message">Commit Message</th>
-                <th class="col-date">Date</th>
+                <th class="col-message">Message</th>
+                <th class="col-date">Age</th>
             </tr>
         </thead>
         <tbody>
@@ -22,7 +22,6 @@
                     <a href="{{ .Hash }}">{{ .ShortHash }}</a>
                 </td>
                 <td class="cell-message">
-                    <!-- div soup because default styles RUIN everything :(-->
                     <div class="message-text" title="{{ .Message }}">
                         {{ .Message }}
                     </div>
@@ -35,13 +34,14 @@
             {{ end }}
         </tbody>
     </table>
+        <hr>
     <section class="pagination">
         {{ if .HasPrev }}
-            <a href="?page={{ .PrevPage }}&ref={{ .Ref }}">[Back]</a>
+            <a href="?page={{ .PrevPage }}&ref={{ .Ref }}">Back</a>
         {{ end }}
         {{ .CurrentPage }}
         {{ if .HasNext }}
-            <a href="?page={{ .NextPage }}&ref={{ .Ref }}">[Next]</a>
+            <a href="?page={{ .NextPage }}&ref={{ .Ref }}">Next</a>
         {{ end }}
     </section>
     {{ else }}

@@ -2,6 +2,7 @@
     --primary: #045c64;
     --gray: #525252;
     --light-gray: #ddd;
+    --secondary-bg: #fafafa;
 }
 
 body {
@@ -25,7 +26,14 @@ pre {
     font-family: monospace;
 }
 
+hr {
+    border: none;
+    border-top: 1px solid var(--light-gray);
+    margin: 20px 0px;
+}
+
 /* Commit table */
+
 .commit-table {
     width: 100%;
     table-layout: fixed;
@@ -69,32 +77,26 @@ pre {
     display: flex;
     justify-content: center;
     width: 100%;
-    gap: 25px;
+    gap: 40px;
 }
 
-/* TODO: Make more common */
-/* TODO: Make line nums sticky */
-.diff-container {
-    width: 100vw;
-    position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-    border-top: 1px solid var(--light-gray);
-    border-bottom: 1px solid var(--light-gray);
-    margin-top: 20px;
-    overflow-x: auto;
-    box-sizing: border-box;
-    padding: 20px;
+/* Commit info */
+
+.commit-info {
+    border-collapse: collapse;
 }
 
-.diff-container span[id^="L"]:hover a {
-    color: #000 !important;
-    cursor: pointer;
+.commit-info th,
+.commit-info td {
+    vertical-align: top;
+    padding: 4px 10px 4px 2px;
+    text-align: left;
 }
 
-.diff-container span[id^="L"]:target a {
-    color: #000 !important;
-    font-weight: bold !important;
+.commit-message {
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: 13px;
+    max-width: 80ch;
+    overflow-wrap: break-word;
 }

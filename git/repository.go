@@ -10,7 +10,6 @@ import (
 
 	gogit "github.com/go-git/go-git/v6"
 	"github.com/go-git/go-git/v6/plumbing"
-	"github.com/go-git/go-git/v6/plumbing/object"
 )
 
 var (
@@ -55,6 +54,7 @@ func (r *Repository) LatestCommit() (*Commit, error) {
 	}, nil
 }
 
+// LastUpdated returns the date when the latest commit was made
 func (r *Repository) LastUpdated() time.Time {
 	commit, err := r.LatestCommit()
 	if err != nil || commit == nil {
@@ -115,30 +115,6 @@ func (r *Repository) GetCommit(hash string) (*Commit, error) {
 	return &Commit{
 		Commit: obj,
 	}, nil
-}
-
-// TODO: Make modular... Now just get first parent
-func (r *Repository) GetPatch(c *Commit) (string, error) {
-	parent, err := c.Parent(0)
-	var parentTree *object.Tree
-	if err == nil {
-		parentTree, err = parent.Tree()
-		if err != nil {
-			return "", err
-		}
-	}
-
-	currentTree, err := c.Tree()
-	if err != nil {
-		return "", err
-	}
-
-	patch, err := parentTree.Patch(currentTree)
-	if err != nil {
-		return "", err
-	}
-
-	return patch.String(), nil
 }
 
 // ResolveRevision resolves a generic string (hash, short branch name, tag, or full ref)

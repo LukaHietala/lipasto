@@ -1,14 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body>
-    {{ .Commit.Message }}
-    <div class="diff-container">
-        {{ .Diff }}
-    </div>
-</body>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="/static/styles.css">
+	</head>
+	<body>
+		<section>
+			<table class="commit-info">
+				<tr>
+					<th>Author</th>
+					<td>
+						{{ .Commit.Author.Name }} &lt;{{ .Commit.Author.Email }}&gt;
+					</td>
+					<td class="commit-date">
+						{{ .Commit.Author.When.Format "Mon Jan 2 15:04:05 2006 -0700" }} 
+					</td>
+				</tr>
+				<tr>
+					<th>Committer</th>
+					<td>
+						{{ .Commit.Committer.Name }} &lt;{{ .Commit.Committer.Email }}&gt;
+					</td>
+					<td class="commit-date">
+						{{ .Commit.Committer.When.Format "Mon Jan 2 15:04:05 2006 -0700" }} 
+					</td>
+				</tr>
+				<tr>
+					<th>Commit</th>
+					<td colspan="2">
+						<a href="#">
+						{{ .Commit.Hash }}
+						</a>
+					</td>
+				</tr>
+				<tr>
+					<th>Tree</th>
+					<td colspan="2">
+						<a href ="#">
+						{{ .Commit.TreeHash }}
+						</a>
+					</td>
+				</tr>
+				<tr>
+					<th>Parents</th>
+					<td colspan="2">
+						{{ range .Commit.ParentHashes }}
+						<a href="/r/{{ $.RepoName }}/commits/{{ .String }}/">{{ .String }}</a>
+						{{ else }}
+						No parents
+						{{ end }}
+					</td>
+				</tr>
+			</table>
+			<hr>
+			<div class="commit-message">{{ .Commit.Message }}</div>
+        </section>
+	</body>
 </html>
+
