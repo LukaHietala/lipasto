@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"embed"
 	"errors"
 	"html/template"
 	"log"
@@ -13,6 +14,12 @@ import (
 	"github.com/go-git/go-git/v6/plumbing"
 	"github.com/lukahietala/lipasto/git"
 )
+
+//go:embed templates/*.html
+var templateFiles embed.FS
+
+//go:embed static
+var staticFiles embed.FS
 
 const root = "/tmp/git-test/"
 
@@ -171,7 +178,7 @@ func main() {
 		"humanizeBytes": humanize.Bytes,
 	}
 
-	tmpl, err := template.New("base").Funcs(funcMap).ParseGlob("./templates/*.html")
+	tmpl, err := template.New("base").Funcs(funcMap).ParseFS(templateFiles, "templates/*.html")
 	if err != nil {
 		log.Fatalf("Unable to parse templates: %v\n", err)
 	}
@@ -182,11 +189,9 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	fs := http.FileServer(http.Dir("./static"))
-	mux.Handle("GET /static/", http.StripPrefix("/static/", fs))
+	mux.Handle("GET /static/", http.FileServer(http.FS(staticFiles)))
 
 	mux.HandleFunc("GET /{$}", app.handleIndex)
-	// Mux screams about conflict with static if not promoted to /r/
 	mux.HandleFunc("GET /r/{repo}/commits/{$}", app.handleCommits)
 	mux.HandleFunc("GET /r/{repo}/commits/{commit}/{$}", app.handleCommit)
 
