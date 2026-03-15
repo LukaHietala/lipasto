@@ -7,8 +7,12 @@
 
 body {
     font-family: sans-serif;
-    max-width: 800px;
+    margin: 0;
+}
+
+main {
     margin: 20px auto;
+    max-width: 800px;
 }
 
 a {
@@ -26,10 +30,58 @@ pre {
     font-family: monospace;
 }
 
+select {
+    padding: 4px 8px;
+    font-size: 14px;
+    font-family: inherit;
+    border: 1px solid var(--light-gray);
+    border-radius: 4px;
+    background-color: var(--secondary-bg);
+    color: var(--gray);
+    cursor: pointer;
+    outline: none;
+}
+
+select:focus {
+    border-color: var(--primary);
+}
+
 hr {
     border: none;
     border-top: 1px solid var(--light-gray);
     margin: 20px 0px;
+}
+
+.navbar {
+    display: grid;
+    grid-template-columns: 1fr 800px 1fr;
+    align-items: center;
+    padding: 15px 6px;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.nav-side {
+    padding: 0 40px;
+}
+
+.nav-center-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
+    color: var(--gray);
+}
+
+.nav-links a.active {
+    color: var(--primary);
 }
 
 /* Commit table */

@@ -105,6 +105,11 @@ func (app *app) handleCommits(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	availableRefs, err := repo.Refs()
+	if err != nil {
+		availableRefs = []string{}
+	}
+
 	var buf bytes.Buffer
 	err = app.tmpl.ExecuteTemplate(&buf, "commits.html", map[string]any{
 		"Repo":        repo,
@@ -115,6 +120,7 @@ func (app *app) handleCommits(w http.ResponseWriter, r *http.Request) {
 		"NextPage":    page + 1,
 		"PrevPage":    page - 1,
 		"Ref":         refQuery,
+		"Refs":        availableRefs,
 	})
 
 	if err != nil {
@@ -129,6 +135,7 @@ func (app *app) handleCommits(w http.ResponseWriter, r *http.Request) {
 func (app *app) handleCommit(w http.ResponseWriter, r *http.Request) {
 	name := r.PathValue("repo")
 	commitHash := r.PathValue("commit")
+	refQuery := r.URL.Query().Get("ref")
 
 	repo, err := git.FindRepository(root, name)
 	if err != nil {
@@ -152,8 +159,9 @@ func (app *app) handleCommit(w http.ResponseWriter, r *http.Request) {
 
 	var buf bytes.Buffer
 	err = app.tmpl.ExecuteTemplate(&buf, "commit.html", map[string]any{
-		"RepoName": name,
-		"Commit":   commit,
+		"Repo":   repo,
+		"Commit": commit,
+		"Ref":    refQuery,
 	})
 
 	if err != nil {

@@ -1,51 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body>
-    {{ if .Commits }}
-    <table class="commit-table">
-        <thead>
-            <tr>
-                <th class="col-hash">Hash</th>
-                <th class="col-message">Message</th>
-                <th class="col-date">Age</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{ range .Commits }}
-            <tr>
-                <td class="cell-hash">
-                    <a href="{{ .Hash }}">{{ .ShortHash }}</a>
-                </td>
-                <td class="cell-message">
-                    <div class="message-text" title="{{ .Message }}">
-                        {{ .Message }}
-                    </div>
-                    <small class="author-label">by {{ .Author.Name }}</small>
-                </td>
-                <td class="cell-date">
-                    {{ .Author.When | humanizeTime }}
-                </td>
-            </tr>
-            {{ end }}
-        </tbody>
-    </table>
-        <hr>
-    <section class="pagination">
-        {{ if .HasPrev }}
-            <a href="?page={{ .PrevPage }}&ref={{ .Ref }}">Back</a>
-        {{ end }}
-        {{ .CurrentPage }}
-        {{ if .HasNext }}
-            <a href="?page={{ .NextPage }}&ref={{ .Ref }}">Next</a>
-        {{ end }}
-    </section>
-    {{ else }}
-    <p>Nothing to see</p>
-    {{ end }}
-</body>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="/static/styles.css">
+	</head>
+	<body>
+		<nav class="navbar">
+			<div class="nav-side">
+				<a href="/">&lt; Back</a>
+			</div>
+			<div class="nav-center-container">
+				<div class="nav-links">
+					<a href="/r/{{ .Repo.Name }}/commits/?ref={{ .Ref }}" class="active">Logs</a>
+					<a href="#">Tree</a>
+					<a href="#">Refs</a>
+				</div>
+				<form method="GET" action="" class="ref-form">
+					<label for="ref-select">Ref:</label>
+					<select name="ref" id="ref-select" onchange="this.form.submit()">
+						<option value="">HEAD</option>
+						{{ range .Refs }}
+						<option value="{{ . }}" {{ if eq . $.Ref }}selected{{ end }}>{{ . }}</option>
+						{{ end }}
+					</select>
+				</form>
+			</div>
+		</nav>
+		<main>
+			{{ if .Commits }}
+			<table class="commit-table">
+				<thead>
+					<tr>
+						<th class="col-hash">Hash</th>
+						<th class="col-message">Message</th>
+						<th class="col-date">Age</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{ range .Commits }}
+					<tr>
+						<td class="cell-hash">
+                        <a href="{{ .Hash }}?ref={{ $.Ref }}">{{ .ShortHash }}</a>
+						</td>
+						<td class="cell-message">
+							<div class="message-text" title="{{ .Message }}">
+								{{ .Message }}
+							</div>
+							<small class="author-label">by {{ .Author.Name }}</small>
+						</td>
+						<td class="cell-date">
+							{{ .Author.When | humanizeTime }}
+						</td>
+					</tr>
+					{{ end }}
+				</tbody>
+			</table>
+			<hr>
+			<section class="pagination">
+				{{ if .HasPrev }}
+				<a href="?page={{ .PrevPage }}&ref={{ .Ref }}">Back</a>
+				{{ end }}
+				{{ .CurrentPage }}
+				{{ if .HasNext }}
+				<a href="?page={{ .NextPage }}&ref={{ .Ref }}">Next</a>
+				{{ end }}
+			</section>
+			{{ else }}
+			<p>Nothing to see</p>
+			{{ end }}
+		</main>
+	</body>
 </html>

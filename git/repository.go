@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -135,6 +136,35 @@ func (r *Repository) ResolveRevision(rev string) (*Commit, error) {
 	}, nil
 }
 
+// Refs returns a sorted list of branch and tag names for this repository
+func (r *Repository) Refs() ([]string, error) {
+	var refs []string
+
+	// Get branches
+	bIter, err := r.raw.Branches()
+	if err != nil {
+		return nil, err
+	}
+	bIter.ForEach(func(ref *plumbing.Reference) error {
+		refs = append(refs, ref.Name().Short())
+		return nil
+	})
+
+	// Get tags
+	tIter, err := r.raw.Tags()
+	if err != nil {
+		return nil, err
+	}
+	tIter.ForEach(func(ref *plumbing.Reference) error {
+		refs = append(refs, ref.Name().Short())
+		return nil
+	})
+
+	sort.Strings(refs)
+
+	return refs, nil
+}
+
 // Git's placeholder description
 const defaultDescription = "Unnamed repository; edit this file 'description' to name the repository."
 
@@ -143,7 +173,7 @@ func (r *Repository) Description() (string, error) {
 	// On bare repos
 	descPath := filepath.Join(r.Path, "description")
 
-	// On regular repos (TODO?: Don't support regular repos)
+	// On regular repos
 	if _, err := os.Stat(descPath); os.IsNotExist(err) {
 		descPath = filepath.Join(r.Path, ".git", "description")
 	}
@@ -164,16 +194,13 @@ func (r *Repository) Description() (string, error) {
 	return desc, nil
 }
 
-// Owner returns owner definded in .git/config (gitweb.owner)
+// Owner returns owner defined in .git/config (gitweb.owner)
 func (r *Repository) Owner() (string, error) {
 	cfg, err := r.raw.Config()
 	if err != nil {
 		return "", err
 	}
 
-	// Looks for:
-	// [gitweb]
-	//     owner = "Laukkaava pomeranian"
 	return cfg.Raw.Section("gitweb").Option("owner"), nil
 }
 
@@ -195,7 +222,6 @@ func ListRepositories(root string) ([]*Repository, error) {
 		r, err := gogit.PlainOpen(repoPath)
 		if err == nil {
 			repos = append(repos, &Repository{
-				// TODO?: With .git it looks cooler, so maybe change
 				Name: strings.TrimSuffix(path.Name(), ".git"),
 				Path: repoPath,
 				raw:  r,
@@ -206,17 +232,30 @@ func ListRepositories(root string) ([]*Repository, error) {
 	return repos, nil
 }
 
-// TODO: Slow and unreliable garbage
-// FindRepository tries to find repository from directory
+// FindRepository directly attempts to open the requested repository
 func FindRepository(root string, name string) (*Repository, error) {
-	repos, err := ListRepositories(root)
-	if err != nil {
-		return nil, err
+	cleanName := filepath.Clean(name)
+	// TODO?: Dangerous, *should* have every necessary rule included
+	if cleanName == "." || cleanName == ".." || strings.Contains(cleanName, string(filepath.Separator)) {
+		return nil, ErrRepositoryNotFound
 	}
-	for _, repo := range repos {
-		if repo.Name == name {
-			return repo, nil
+
+	// Try opening directly with .git suffix
+	repoPath := filepath.Join(root, cleanName+".git")
+	r, err := gogit.PlainOpen(repoPath)
+
+	// Fallback to opening as a regular directory
+	if err != nil {
+		repoPath = filepath.Join(root, cleanName)
+		r, err = gogit.PlainOpen(repoPath)
+		if err != nil {
+			return nil, ErrRepositoryNotFound
 		}
 	}
-	return nil, ErrRepositoryNotFound
+
+	return &Repository{
+		Name: strings.TrimSuffix(filepath.Base(repoPath), ".git"),
+		Path: repoPath,
+		raw:  r,
+	}, nil
 }
