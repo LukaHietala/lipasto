@@ -1,1 +1,1 @@
-Like Github, but tastier
+Like Github, but more scrumptious
